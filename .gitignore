@@ -1,0 +1,7 @@
+.*.swp
+*.LISP
+*.UNLISP
+*.o
+*.c
+*.h
+*.data
