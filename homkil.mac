@@ -1,0 +1,82 @@
+/* number of columns of a matrix */
+numcol(m) :=
+    if length(m) = 0 then 0
+        else length(m[1]);
+
+/* flatten matrix into a column vector */
+flatmat(m) :=
+    block(
+        [a],
+        a : matrix(),
+        for i : 1 thru numcol(m) do
+            a : addrow(a, col(m, i)),
+        a
+    );
+
+/* flatten list of matrices into a matrix */
+flatmatls(l) :=
+    block(
+        [a],
+        a : matrix(),
+        for i : 1 thru length(l) do
+            a : addcol(a, flatmat(l[i])),
+        a
+    );
+
+/* linear combination given by a column vector */
+collincomb(c, b) :=
+    block(
+        [a],
+        a : 0,
+        for i : 1 thru length(b) do
+            a : a + c[i][1] * b[i],
+        a
+    );
+
+/* least-square solution of m . x = y */
+lssolve(m) :=
+    block(
+        [mct],
+        mct : conjugate(transpose(m)),
+        ((mct . m)^^-1) . mct
+    );
+
+/* adjoint representation of a matrix Lie algebra */
+adjrep(l) :=
+    block(
+        [n, lss, a, aa, x, y, c],
+        n : length(l),
+        lss : lssolve(flatmatls(l)),
+        a : [],
+        for i : 1 thru n do (
+            x : l[i],
+            aa : matrix(),
+            for j : 1 thru n do (
+                y : l[j],
+                c : x . y - y . x,
+                aa : addcol(aa, lss . flatmat(c))
+            ),
+            a : endcons(aa, a)
+        ),
+        a
+    );
+
+/* check Lie algebra representation, i.e. collect equations
+   r(x) . r(y) - r(y) . r(x) - r(ad(x)(y)) = 0 */
+checkrep(r, ad) :=
+    block(
+        [n, a, rx, ry, adx, c1, c2],
+        n : length(r),
+        a : matrix(),
+        for i : 1 thru n do (
+            rx : r[i],
+            adx : ad[i],
+            for j : 1 thru n do (
+                ry : r[j],
+                c1 : rx . ry - ry . rx,
+                c2 : collincomb(col(adx, j), r),
+                a : addrow(a, c1 - c2)
+            )
+        ),
+        a
+    );
