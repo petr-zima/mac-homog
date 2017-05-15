@@ -82,3 +82,71 @@ lacurv(r, ad) :=
         ),
         a
     );
+
+/* inject vector into affine LA */
+iv2aff(v) :=
+    block(
+        [n],
+        n : length(v),
+        addrow(
+            zeromatrix(1, n + 1),
+            addcol(v, zeromatrix(n, n))
+        )
+    );
+
+/* inject linear map into affine LA */
+im2aff(m) :=
+    block(
+        [nr, nc],
+        nr : length(m),
+        nc : numcol(m),
+        addrow(
+            zeromatrix(1, nc + 1),
+            addcol(zeromatrix(nr, 1), m)
+        )
+    );
+
+/* project affine LA onto vector */
+paff2v(a) :=
+    col(sumbatrix(1, a), 1);
+
+/* project affine LA onto linear map */
+paff2m(a) :=
+    submatrix(1, a, 1);
+
+/* decompose matrix to 2 blocks horizontally */
+blockmat2h(m, nc) :=
+    block(
+        [a, b],
+        a : matrix(),
+        b : matrix(),
+        for i : 1 thru numcol(m) do
+            if i <= nc
+                then a : addcol(a, col(m, i))
+                else b : addcol(b, col(m, i)),
+        matrix([a, b])
+    );
+
+/* decompose matrix to 2 blocks vertically */
+blockmat2v(nr, m) :=
+    block(
+        [a, b],
+        a : matrix(),
+        b : matrix(),
+        for i : 1 thru length(m) do
+            if i <= nr
+                then a : addrow(a, row(m, i))
+                else b : addrow(b, row(m, i)),
+        matrix([a], [b])
+    );
+
+/* decompose matrix to four blocks */
+blockmat4(nr, m, nc) :=
+    block(
+        [mv],
+        mv : blockmat2v(nr, m),
+        addrow(
+            blockmat2h(mv[1][1], nc),
+            blockmat2h(mv[2][1], nc)
+        )
+    );
