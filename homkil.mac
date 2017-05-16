@@ -83,6 +83,17 @@ lacurv(r, ad) :=
         a
     );
 
+/* check Lie algebra structure */
+checkla(l, ad) :=
+    block(
+        [c],
+        c : lacurv(l, ad),
+        if zeromatrixp(c) then return(true),
+        print(box("Not a Lie algebra, obstruction:")),
+        print(c),
+        false
+    );
+
 /* inject vector into affine LA */
 iv2aff(v) :=
     block(
@@ -221,4 +232,31 @@ affconnadd(ac, lc) :=
         for i : n2 + 1 thru n1 do
             a : endcons(ac[i], a),
         a
+    );
+
+/* check affine structure (= reductive pair) */
+checkaffcurv(blcurv) :=
+    block(
+        [c0],
+        c0 : matrix(
+            [zerofor(blcurv[1][1]),
+                blcurv[1][2]],
+            [blcurv[2][1],
+                blcurv[2][2]]
+        ),
+        if zeromatrixp(c0) then return(true),
+        print(box("Not an affine structure, obstruction:")),
+        print(c0),
+        false
+    );
+
+/* check Levi-Civita connection (= torsion free) */
+checklcacurv(acurv) :=
+    block(
+        [t],
+        t : matpaff2v(acurv),
+        if zeromatrixp(t) then return(true),
+        print(box("Not a Levi-Civita connection, torsion:")),
+        print(t),
+        false
     );
