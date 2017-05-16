@@ -219,6 +219,6 @@ affconnadd(ac, lc) :=
             a : endcons(m, a)
         ),
         for i : n2 + 1 thru n1 do
-            s : endcons(ac[i], a),
+            a : endcons(ac[i], a),
         a
     );
