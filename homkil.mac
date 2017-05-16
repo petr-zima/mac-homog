@@ -108,11 +108,17 @@ im2aff(m) :=
 
 /* project affine LA onto vector */
 paff2v(a) :=
-    col(sumbatrix(1, a), 1);
+    col(submatrix(1, a), 1);
+
+matpaff2v(m) :=
+    matrixmap(paff2v, m);
 
 /* project affine LA onto linear map */
 paff2m(a) :=
     submatrix(1, a, 1);
+
+matpaff2m(m) :=
+    matrixmap(paff2m, m);
 
 /* decompose matrix to 2 blocks horizontally */
 blockmat2h(m, nc) :=
