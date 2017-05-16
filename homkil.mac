@@ -178,3 +178,47 @@ la2aff(ad, n) :=
         ),
         r
     );
+
+/* Levi-Civita connection from torsion */
+lcconn1(t, g, i, j) :=
+    block(
+        [gi, tj],
+        gi : g[i],
+        tj : apply(addcol, t[j]),
+        transpose(gi . tj . (g^^-1))
+    );
+
+lcconn(t, g) :=
+    block(
+        [n, a, aa, c, tij, gtij, gtji],
+        n : length(t),
+        a : [],
+        for i : 1 thru n do (
+            aa : matrix(),
+            for j : 1 thru n do (
+                tij : t[i][j],
+                gtij : lcconn1(t, g, i, j),
+                gtji : lcconn1(t, g, j, i),
+                c : (gtij + gtji - tij) / 2,
+                aa : addcol(aa, c)
+            ),
+            a : endcons(aa, a)
+        ),
+        a
+    );
+
+/* add linear connection to an affine connection */
+affconnadd(ac, lc) :=
+    block(
+        [n1, a, m],
+        n1 : length(ac),
+        n2 : length(lc),
+        a : [],
+        for i : 1 thru n2 do (
+            m : ac[i] + im2aff(lc[i]),
+            a : endcons(m, a)
+        ),
+        for i : n2 + 1 thru n1 do
+            s : endcons(ac[i], a),
+        a
+    );
