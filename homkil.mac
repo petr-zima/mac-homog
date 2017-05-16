@@ -251,12 +251,39 @@ checkaffcurv(blcurv) :=
     );
 
 /* check Levi-Civita connection (= torsion free) */
-checklcacurv(acurv) :=
+checklctors(tors) :=
     block(
-        [t],
-        t : matpaff2v(acurv),
-        if zeromatrixp(t) then return(true),
+        if zeromatrixp(tors) then return(true),
         print(box("Not a Levi-Civita connection, torsion:")),
-        print(t),
+        print(tors),
         false
+    );
+
+/* prepare Riemannian homogeneous space from [l, g];
+   l = basis of a LA split to V + h
+   g = metric on V
+
+   returns [ad, lc, curv];
+   ad = adjoint representation of l
+   lc = Levi-Civita connection
+   curv = curvature of lc */
+riemhom(l, g) :=
+    block(
+        [n, ad, aff, blcurv, acurv, tors, lc, curv],
+        n : length(g),
+        ad : adjrep(l),
+        if not checkla(l, ad) then return(false),
+        aff : la2aff(ad, n),
+        blcurv : blockmat4(n, lacurv(aff, ad), n),
+        if not checkaffcurv(blcurv) then return(false),
+        acurv : blcurv[1][1],
+        tors : matpaff2v(acurv),
+        lc : lcconn(tors, g),
+        aff : affconnadd(aff, lc),
+        blcurv : blockmat4(n, lacurv(aff, ad), n),
+        acurv : blcurv[1][1],
+        tors : matpaff2v(acurv),
+        if not checklctors(tors) then return(false),
+        curv : matpaff2m(acurv),
+        [ad, lc, curv]
     );
