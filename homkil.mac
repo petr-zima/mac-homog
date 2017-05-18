@@ -250,6 +250,31 @@ checkaffcurv(blcurv) :=
         false
     );
 
+/* apply a representation on a metric (bilinear form) */
+repmet(r, g) :=
+    block(
+        [n, a, c, gc],
+        n : length(g),
+        a : [],
+        for i : 1 thru length(r) do (
+            c : blockmat4(n, r[i], n)[1][1],
+            gc : transpose(c) . g + g . c,
+            a : endcons(gc, a)
+        ),
+        a    
+    );
+
+/* check invariant metric (bilinear form) */
+checkinvmet(r, g) :=
+    block(
+        [rg],
+        rg : repmet(r, g),
+        if zeromatrixp(rg) then return(true),
+        print(box("Not an invariant metric, obstruction:")),
+        print(rg),
+        false
+    );
+
 /* check Levi-Civita connection (= torsion free) */
 checklctors(tors) :=
     block(
