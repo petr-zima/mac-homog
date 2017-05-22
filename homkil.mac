@@ -332,6 +332,17 @@ riemhom(l, g) :=
         [ad, lc, curv]
     );
 
+/* factor out gcd from vector */
+gcdnorm(v) :=
+    block(
+        [l, n, lgcd],
+        l : transpose(v)[1],
+        n : length(l),
+        lgcd : apply(ezgcd, l),
+        print(lgcd),
+        transpose(matrix(lastn(lgcd, n)))
+    );
+
 /* dual, i.e. negative transpose of a matrix */
 dualrep(m) :=
     - transpose(m);
@@ -626,13 +637,13 @@ kfrep(conn, curv, p) :=
     );
 
 /* Killing forms by 1st integrability condition */
-kfsolve1(rh, p, fac) :=
+kfsolve1(rh, p) :=
     block(
         [ad, conn, curv, kfr, kfc],
         [ad, conn, curv] : rh,
         kfr : kfrep(conn, curv, p),
         kfc : lacurv(kfr, ad),
-        nullspace(flatblockmat(kfc / fac))
+        map(gcdnorm, nullspace(flatblockmat(kfc)))
     );
 
 /* elementary unitary matrix */
