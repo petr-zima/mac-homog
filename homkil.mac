@@ -297,6 +297,7 @@ riemhom(l, g) :=
         if not checkla(l, ad) then return(false),
         adspl : nsplitls(ad, n),
         hc : blockmat4ls(n, adspl[2], n)[1][1],
+        if not checkinvmet(hc, g) then return(false),
         aff : affmatls(append(zeromatls(n), hc)),
         blcurv : blockmat4(n, lacurv(aff, ad), n),
         if not checkaffcurv(blcurv) then return(false),
