@@ -313,6 +313,14 @@ riemhom(l, g) :=
         [ad, lc, curv]
     );
 
+/* dual, i.e. negative transpose of a matrix */
+dualrep(m) :=
+    - transpose(m);
+
+/* dual LA representation */
+dualrepls(l) :=
+    map(dualrep, l);
+
 /* elementary unitary matrix */
 eumat(n, x, i, j) :=
     block(
