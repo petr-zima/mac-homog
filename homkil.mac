@@ -312,3 +312,37 @@ riemhom(l, g) :=
         curv : acurv[2][2],
         [ad, lc, curv]
     );
+
+/* elementary unitary matrix */
+eumat(n, x, i, j) :=
+    block(
+        [em],
+        em : ematrix(n, n, x, i, j),
+        if i = j then em : em / 2,
+        em - conjugate(transpose(em))
+    );
+
+/* unitary LA */
+ula(n) :=
+    block(
+        [a],
+        a : [],
+        for i : 1 thru n do (
+            a : endcons(eumat(n, %i, i, i), a),
+            for j : i + 1 thru n do (
+                a : endcons(eumat(n, 1, j, i), a),
+                a : endcons(eumat(n, %i, j, i), a)
+            )
+        ),
+        a
+    );
+
+/* Berger sphere */
+bergs(m) :=
+    block(
+        [l, n, g],
+        l : ula(m),
+        n : 2 * m - 1,
+        g : ident(n) + ematrix(n, n, s - 1, 1, 1),
+        ratsimp(riemhom(l, g))
+    );
