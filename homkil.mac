@@ -13,13 +13,26 @@ flatmat(m) :=
         a
     );
 
-/* flatten list of matrices into a matrix */
+/* flatten list of matrices into a long-row matrix */
 flatmatls(l) :=
     block(
         [a],
         a : matrix(),
         for i : 1 thru length(l) do
             a : addcol(a, flatmat(l[i])),
+        a
+    );
+
+/* flatten matrix of matrices into a long-column matrix */
+flatblockmat(m) :=
+    block(
+        [a, ri],
+        a : matrix(),
+        for i : 1 thru length(m) do (
+            ri : m[i],
+            for j : 1 thru length(ri) do
+                a : addrow(a, ri[j])
+        ),
         a
     );
 
