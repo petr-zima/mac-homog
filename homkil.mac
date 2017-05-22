@@ -599,14 +599,16 @@ curvext(curvp, v, p) :=
 /* representation on Killing forms */
 kfrep(conn, curv, p) :=
     block(
-        [m, n, p1, connp, connp1, curvp,
+        [m, n, p1, connd, connp, connp1, curvd, curvp,
         a, b, b11, b12, b21, b22, ei],
         m : length(conn),
         n : length(curv),
         p1 : p + 1,
-        connp : extrepls(conn, p),
-        connp1 : extrepls(conn, p1),
-        curvp : extrepmat(curv, p),
+        connd : dualrepls(conn),
+        connp : extrepls(connd, p),
+        connp1 : extrepls(connd, p1),
+        curvd : dualrepmat(curv),
+        curvp : extrepmat(curvd, p),
         a : [],
         for i : 1 thru m do (
             ei : evect(i, n),
