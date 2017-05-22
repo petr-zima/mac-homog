@@ -94,42 +94,41 @@ checkla(l, ad) :=
         false
     );
 
-/* inject vector into affine LA */
-iv2aff(v) :=
-    block(
-        [n],
-        n : length(v),
-        addrow(
-            zeromatrix(1, n + 1),
-            addcol(v, zeromatrix(n, n))
-        )
-    );
+/* split list to fist n elements and the rest */
+nsplitls(l, n) :=
+    [firstn(l, n), lastn(l, length(l) - n)];
 
-/* inject linear map into affine LA */
-im2aff(m) :=
+/* list of n zero matrices n x n */
+zeromatls(n) :=
+    makelist(zeromatrix(n, n), n);
+
+/* elementary basis vector, or zero if k > n */
+evect(k, n) :=
+    if k <= n
+        then ematrix(n, 1, 1, k, 1)
+        else zeromatrix(n, 1);
+
+/* affine LA matrix from evect and a matrix */
+affmat(k, m) :=
     block(
         [nr, nc],
         nr : length(m),
         nc : numcol(m),
         addrow(
-            zeromatrix(1, nc + 1),
-            addcol(zeromatrix(nr, 1), m)
+            zeromatrix(1, 1 + nc),
+            addcol(evect(k, nr), m)
         )
     );
 
-/* project affine LA onto vector */
-paff2v(a) :=
-    col(submatrix(1, a), 1);
-
-matpaff2v(m) :=
-    matrixmap(paff2v, m);
-
-/* project affine LA onto linear map */
-paff2m(a) :=
-    submatrix(1, a, 1);
-
-matpaff2m(m) :=
-    matrixmap(paff2m, m);
+/* list of affine LA matrices */
+affmatls(l) :=
+    block(
+        [a],
+        a : [],
+        for i : 1 thru length(l) do
+            a : endcons(affmat(i, l[i]), a),
+        a
+    );
 
 /* decompose matrix to 2 blocks horizontally */
 blockmat2h(m, nc) :=
@@ -168,26 +167,40 @@ blockmat4(nr, m, nc) :=
         )
     );
 
-/* map reductive LA pair g = V + h to the
-   corresponding affine LA m = R^n + gl(n);
-   V = span(first n basis elements)
-   h = span(rest of basis elements) */
-la2aff(ad, n) :=
+/* decompose list of matrices to four blocks */
+blockmat4ls(nr, l, nc) :=
     block(
-        [idn, a, r],
-        r : [],
-        /* V maps to R^n simply by coordinates */
-        idn : ident(n),
-        for i : 1 thru n do (
-            a : col(idn, i),
-            r : endcons(iv2aff(a), r)
+        [a11, a12, a21, a22, b],
+        a11 : [],
+        a12 : [],
+        a21 : [],
+        a22 : [],
+        for i : 1 thru length(l) do (
+            b : blockmat4(nr, l[i], nc),
+            a11 : endcons(b[1][1], a11),
+            a12 : endcons(b[1][2], a12),
+            a21 : endcons(b[2][1], a21),
+            a22 : endcons(b[2][2], a22)
         ),
-        /* h maps to gl(n) by ad restricted to V */
-        for i : n + 1 thru length(ad) do (
-            a : blockmat4(n, ad[i], n)[1][1],
-            r : endcons(im2aff(a), r)
+        matrix([a11, a12], [a21, a22])
+    );
+
+/* decompose matrix of matrices to four blocks */
+blockmat4mat(nr, m, nc) :=
+    block(
+        [a11, a12, a21, a22, bl],
+        a11 : matrix(),
+        a12 : matrix(),
+        a21 : matrix(),
+        a22 : matrix(),
+        for i : 1 thru length(m) do (
+            bl : blockmat4ls(nr, m[i], nc),
+            a11 : addrow(a11, bl[1][1]),
+            a12 : addrow(a12, bl[1][2]),
+            a21 : addrow(a21, bl[2][1]),
+            a22 : addrow(a22, bl[2][2])
         ),
-        r
+        matrix([a11, a12], [a21, a22])
     );
 
 /* Levi-Civita connection from torsion */
@@ -215,22 +228,6 @@ lcconn(t, g) :=
             ),
             a : endcons(aa, a)
         ),
-        a
-    );
-
-/* add linear connection to an affine connection */
-affconnadd(ac, lc) :=
-    block(
-        [n1, a, m],
-        n1 : length(ac),
-        n2 : length(lc),
-        a : [],
-        for i : 1 thru n2 do (
-            m : ac[i] + im2aff(lc[i]),
-            a : endcons(m, a)
-        ),
-        for i : n2 + 1 thru n1 do
-            a : endcons(ac[i], a),
         a
     );
 
@@ -294,21 +291,23 @@ checklctors(tors) :=
    curv = curvature of lc */
 riemhom(l, g) :=
     block(
-        [n, ad, aff, blcurv, acurv, tors, lc, curv],
+        [n, ad, adspl, hc, aff, blcurv, acurv, tors, lc],
         n : length(g),
         ad : adjrep(l),
         if not checkla(l, ad) then return(false),
-        aff : la2aff(ad, n),
+        adspl : nsplitls(ad, n),
+        hc : blockmat4ls(n, adspl[2], n)[1][1],
+        aff : affmatls(append(zeromatls(n), hc)),
         blcurv : blockmat4(n, lacurv(aff, ad), n),
         if not checkaffcurv(blcurv) then return(false),
-        acurv : blcurv[1][1],
-        tors : matpaff2v(acurv),
-        lc : lcconn(tors, g),
-        aff : affconnadd(aff, lc),
+        acurv : blockmat4mat(1, blcurv[1][1], 1),
+        tors : acurv[2][1],
+        lc : append(lcconn(tors, g), hc),
+        aff : affmatls(lc),
         blcurv : blockmat4(n, lacurv(aff, ad), n),
-        acurv : blcurv[1][1],
-        tors : matpaff2v(acurv),
+        acurv : blockmat4mat(1, blcurv[1][1], 1),
+        tors : acurv[2][1],
         if not checklctors(tors) then return(false),
-        curv : matpaff2m(acurv),
+        curv : acurv[2][2],
         [ad, lc, curv]
     );
