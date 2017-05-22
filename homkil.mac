@@ -418,6 +418,31 @@ flatextidx(l, n) :=
         k1 + flatextidx(remextidx(l), n1)
     );
 
+/* exterior power of a matrix (in LA sense) */
+extrep(m, p) :=
+    block(
+        [n, np, a, mi, mi1, s, k1, v, x],
+        n : length(m),
+        np : binomial(n, p),
+        a : zeromatrix(np, np),
+        for k : 1 thru np do (
+            mi : splitextidx(k, n, p),
+            for r : 1 thru p do (
+                v : col(m, mi[r]),
+                for l : 1 thru n do (
+                    x : v[l][1],
+                    mi1 : repextidx(mi, r, l),
+                    s : mi1[2],
+                    if s # 0 then (
+                        k1 : flatextidx(mi1[1], n),
+                        a[k1][k] : a[k1][k] + s * x
+                    )
+                )
+            )
+        ),
+        a
+    );
+
 /* elementary unitary matrix */
 eumat(n, x, i, j) :=
     block(
