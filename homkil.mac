@@ -392,6 +392,33 @@ repextidx(l, r, i) :=
         [l1, s]
     );
 
+/* merge index into multi-index by value */
+extpidx(l, i) :=
+    block(
+        [p, j, j1, i1, a, s],
+        p : length(l),
+        s : 1,
+        j : 0,
+        do (
+            j1 : j,
+            if j1 = p then return('done),
+            j : j + 1,
+            i1 : l[j],
+            if i1 > i then return('done),
+            if i1 = i then (
+                s : 0,
+                return('done)
+            ),
+            s : -s
+        ),
+        a : append(
+            firstn(l, j1),
+            [i],
+            lastn(l, p - j1)
+        ),
+        [a, s]
+    );
+
 /* find and remove index from multi-index by value */
 intpidx(l, i) :=
     block(
@@ -456,6 +483,30 @@ extrep(m, p) :=
                         k1 : flatextidx(mi1[1], n),
                         a[k1][k] : a[k1][k] + s * x
                     )
+                )
+            )
+        ),
+        a
+    );
+
+/* matrix of exterior product */
+extp(v, p) :=
+    block(
+        [n, p1, np, np1, a, mi, mi1, s, k1, x],
+        n : length(v),
+        p1 : p + 1,
+        np : binomial(n, p),
+        np1 : binomial(n, p1),
+        a : zeromatrix(np1, np),
+        for k : 1 thru np do (
+            mi : splitextidx(k, n, p),
+            for l : 1 thru n do (
+                x : v[l][1],
+                mi1 : extpidx(mi, l),
+                s : mi1[2],
+                if s # 0 then (
+                    k1 : flatextidx(mi1[1], n),
+                    a[k1][k] : a[k1][k] + s * x
                 )
             )
         ),
