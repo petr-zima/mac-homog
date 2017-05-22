@@ -339,7 +339,6 @@ gcdnorm(v) :=
         l : transpose(v)[1],
         n : length(l),
         lgcd : apply(ezgcd, l),
-        print(lgcd),
         transpose(matrix(lastn(lgcd, n)))
     );
 
