@@ -96,7 +96,13 @@ checkla(l, ad) :=
 
 /* split list to fist n elements and the rest */
 nsplitls(l, n) :=
-    [firstn(l, n), lastn(l, length(l) - n)];
+    block(
+        [m],
+        m : length(l),
+        if m <= n
+            then [l, []]
+            else [firstn(l, n), lastn(l, m - n)]
+    );
 
 /* list of n zero matrices n x n */
 zeromatls(n) :=
