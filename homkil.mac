@@ -327,6 +327,10 @@ dualrep(m) :=
 dualrepls(l) :=
     map(dualrep, l);
 
+/* dual of matrix of matrices */
+dualrepmat(m) :=
+    matrixmap(dualrep, m);
+
 /* add first index to exterior multi-index */
 addextidx(i1, l) :=
     block(
@@ -489,6 +493,30 @@ extrep(m, p) :=
         a
     );
 
+/* exterior power of a list of matrices */
+extrepls(l, p) :=
+    block(
+        [a, b],
+        a : [],
+        for i : 1 thru length(l) do (
+            b : extrep(l[i], p),
+            a : endcons(b, a)
+        ),
+        a
+    );
+
+/* exterior power of a matrix of matrices */
+extrepmat(m, p) :=
+    block(
+        [a, b],
+        a : matrix(),
+        for i : 1 thru length(m) do (
+            b : extrepls(m[i], p),
+            a : addrow(a, b)
+        ),
+        a
+    );
+
 /* matrix of exterior product */
 extp(v, p) :=
     block(
@@ -533,6 +561,51 @@ intp(v, p) :=
                     a[k1][k] : a[k1][k] + s * x
                 )
             )
+        ),
+        a
+    );
+
+/* skew-symmetrized action of curvature */
+curvext(curvp, v, p) :=
+    block(
+        [n, p1, np, np1, vc, a, ei, b],
+        n : length(v),
+        p1 : p + 1,
+        np : binomial(n, p),
+        np1 : binomial(n, p1),
+        vc : transpose(v) . curvp,
+        a : zeromatrix(np1, np),
+        for i : 1 thru n do (
+            ei : evect(i, n),
+            b : extp(ei, p) . (vc . ei),
+            a : a + b
+        ),
+        a
+    );
+
+/* representation on Killing forms */
+kfrep(conn, curv, p) :=
+    block(
+        [m, n, p1, connp, connp1, curvp,
+        a, b, b11, b12, b21, b22, ei],
+        m : length(conn),
+        n : length(curv),
+        p1 : p + 1,
+        connp : extrepls(conn, p),
+        connp1 : extrepls(conn, p1),
+        curvp : extrepmat(curv, p),
+        a : [],
+        for i : 1 thru m do (
+            ei : evect(i, n),
+            b11 : connp[i],
+            b22 : connp1[i],
+            b12 : - intp(ei, p1),
+            b21 : - 1/p * curvext(curvp, ei, p),
+            b : addrow(
+                addcol(b11, b12),
+                addcol(b21, b22)
+            ),
+            a : endcons(b, a)
         ),
         a
     );
