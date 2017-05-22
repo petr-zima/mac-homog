@@ -327,6 +327,97 @@ dualrep(m) :=
 dualrepls(l) :=
     map(dualrep, l);
 
+/* add first index to exterior multi-index */
+addextidx(i1, l) :=
+    block(
+        [a],
+        a : [i1],
+        for i : 1 thru length(l) do
+            a : endcons(l[i] + i1, a),
+        a
+    );
+
+/* remove first index from exterior multi-index */
+remextidx(l) :=
+    block(
+        [i1, a],
+        i1 : l[1],
+        a : [],
+        for i : 2 thru length(l) do
+            a : endcons(l[i] - i1, a),
+        a
+    );
+
+/* replace index in exterior multi-index */
+repextidx(l, r, i) :=
+    block(
+        [l1, p, i1, j, j1, s],
+        l1 : copylist(l),
+        i1 : l1[r],
+        s : 1,
+        if i1 > i then (
+            j : r,
+            do (
+                j1 : j,
+                if j1 = 1 then return('done),
+                j : j - 1,
+                i1 : l1[j],
+                if i1 < i then return('done),
+                if i1 = i then (
+                    s : 0,
+                    return('done)
+                ),
+                l1[j1] : i1,
+                s : -s
+            ),
+            l1[j1] : i
+        ) else if i1 < i then (
+            p : length(l),
+            j : r,
+            do (
+                j1 : j,
+                if j1 = p then return('done),
+                j : j + 1,
+                i1 : l1[j],
+                if i1 > i then return('done),
+                if i1 = i then (
+                    s : 0,
+                    return('done)
+                ),
+                l1[j1] : i1,
+                s : -s
+            ),
+            l1[j1] : i
+        ),
+        [l1, s]
+    );
+
+/* split flat index to exterior multi-index */
+splitextidx(k, n, p) :=
+    block(
+        [m, l, k1],
+        if p = 0 then return([]),
+        m : binomial(n, p) - k,
+        l : p,
+        do (
+            k1 : binomial(l, p) - m,
+            if k1 > 0 then return('done),
+            l : l + 1
+        ),
+        addextidx(n - l + 1, splitextidx(k1, l - 1, p - 1))
+    );
+
+/* flatten exterior multi-index */
+flatextidx(l, n) :=
+    block(
+        [p, n1, k1],
+        p : length(l),
+        if p = 0 then return(1),
+        n1 : n - l[1],
+        k1 : binomial(n, p) - binomial(n1 + 1, p),
+        k1 + flatextidx(remextidx(l), n1)
+    );
+
 /* elementary unitary matrix */
 eumat(n, x, i, j) :=
     block(
