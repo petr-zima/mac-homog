@@ -626,13 +626,13 @@ kfrep(conn, curv, p) :=
     );
 
 /* Killing forms by 1st integrability condition */
-kfsolve1(rh, p) :=
+kfsolve1(rh, p, fac) :=
     block(
         [ad, conn, curv, kfr, kfc],
         [ad, conn, curv] : rh,
         kfr : kfrep(conn, curv, p),
         kfc : lacurv(kfr, ad),
-        nullspace(flatblockmat(kfc))
+        nullspace(flatblockmat(kfc / fac))
     );
 
 /* elementary unitary matrix */
