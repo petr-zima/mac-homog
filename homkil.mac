@@ -46,6 +46,16 @@ flatblockmatc(m) :=
         a
     );
 
+/* multiply a matrix by a list of matrices */
+matmulls(m, l) :=
+    block(
+        [a],
+        a : [],
+        for i :1 thru length(l) do
+            a : endcons(m . l[i], a),
+        a
+    );
+
 /* linear combination given by a column vector */
 collincomb(c, b) :=
     block(
@@ -352,6 +362,19 @@ gcdnorm(v) :=
         transpose(matrix(lastn(lgcd, n)))
     );
 
+/* truncate triangularized matrix */
+truncmat(m) :=
+    block(
+        [n, i],
+        n : length(m),
+        i : 1,
+        while i <= n do (
+            if zeromatrixp(m[i]) then return('done),
+            i : i + 1
+        ),
+        firstn(m, i - 1)
+    );
+
 /* dual, i.e. negative transpose of a matrix */
 dualrep(m) :=
     - transpose(m);
@@ -645,14 +668,25 @@ kfrep(conn, curv, p) :=
         a
     );
 
-/* Killing forms by 1st integrability condition */
-kfsolve1(rh, p) :=
+/* solve Killing forms by integrability conditions */
+kfsolve(rh, p) :=
     block(
-        [ad, conn, curv, kfr, kfc],
+        [ad, conn, curv, r, c, c1, o, s],
         [ad, conn, curv] : rh,
-        kfr : kfrep(conn, curv, p),
-        kfc : lacurv(kfr, ad),
-        map(gcdnorm, nullspace(flatblockmatc(kfc)))
+        r : kfrep(conn, curv, p),
+        c : flatblockmatc(lacurv(r, ad)),
+        c : truncmat(echelon(c)),
+        o : 1,
+        do (
+            c1 : flatmatlsc(matmulls(c, r)),
+            c1 : addrow(c, c1),
+            c1 : truncmat(echelon(c1)),
+            if length(c1) = length(c) then return('done),
+            c : c1,
+            o : o + 1
+        ),
+        s : map(gcdnorm, nullspace(c)),
+        [o, s]
     );
 
 /* elementary unitary matrix */
