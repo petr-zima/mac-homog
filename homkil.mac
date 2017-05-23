@@ -4,7 +4,7 @@ numcol(m) :=
         else length(m[1]);
 
 /* flatten matrix into a column vector */
-flatmat(m) :=
+flatmatc(m) :=
     block(
         [a],
         a : matrix(),
@@ -14,17 +14,27 @@ flatmat(m) :=
     );
 
 /* flatten list of matrices into a long-row matrix */
-flatmatls(l) :=
+flatmatlsr(l) :=
     block(
         [a],
         a : matrix(),
         for i : 1 thru length(l) do
-            a : addcol(a, flatmat(l[i])),
+            a : addcol(a, flatmatc(l[i])),
+        a
+    );
+
+/* flatten list of matrices into a long-column matrix */
+flatmatlsc(l) :=
+    block(
+        [a],
+        a : matrix(),
+        for i : 1 thru length(l) do
+            a : addrow(a, l[i]),
         a
     );
 
 /* flatten matrix of matrices into a long-column matrix */
-flatblockmat(m) :=
+flatblockmatc(m) :=
     block(
         [a, ri],
         a : matrix(),
@@ -59,7 +69,7 @@ adjrep(l) :=
     block(
         [n, lss, a, aa, x, y, c],
         n : length(l),
-        lss : lssolve(flatmatls(l)),
+        lss : lssolve(flatmatlsr(l)),
         a : [],
         for i : 1 thru n do (
             x : l[i],
@@ -67,7 +77,7 @@ adjrep(l) :=
             for j : 1 thru n do (
                 y : l[j],
                 c : x . y - y . x,
-                aa : addcol(aa, lss . flatmat(c))
+                aa : addcol(aa, lss . flatmatc(c))
             ),
             a : endcons(aa, a)
         ),
@@ -642,7 +652,7 @@ kfsolve1(rh, p) :=
         [ad, conn, curv] : rh,
         kfr : kfrep(conn, curv, p),
         kfc : lacurv(kfr, ad),
-        map(gcdnorm, nullspace(flatblockmat(kfc)))
+        map(gcdnorm, nullspace(flatblockmatc(kfc)))
     );
 
 /* elementary unitary matrix */
