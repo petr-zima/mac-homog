@@ -675,17 +675,17 @@ kfsolve(rh, p) :=
         [ad, conn, curv] : rh,
         r : kfrep(conn, curv, p),
         c : flatblockmatc(lacurv(r, ad)),
-        c : truncmat(echelon(c)),
+        c : gcdgauss(c),
         o : 1,
         do (
             c1 : flatmatlsc(matmulls(c, r)),
             c1 : addrow(c, c1),
-            c1 : truncmat(echelon(c1)),
+            c1 : gcdgauss(c1),
             if length(c1) = length(c) then return('done),
             c : c1,
             o : o + 1
         ),
-        s : map(gcdnorm, nullspace(c)),
+        s : map(gcdnorm, nullspace(echelon(c))),
         [o, s]
     );
 
