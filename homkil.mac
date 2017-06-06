@@ -1,3 +1,5 @@
+load("amat.mac");
+
 /* number of columns of a matrix */
 numcol(m) :=
     if length(m) = 0 then 0
@@ -671,22 +673,25 @@ kfrep(conn, curv, p) :=
 /* solve Killing forms by integrability conditions */
 kfsolve(rh, p) :=
     block(
-        [ad, conn, curv, r, c, c1, o, s],
+        [ad, conn, curv, r, c, c1, a, o, l, s],
         [ad, conn, curv] : rh,
         r : kfrep(conn, curv, p),
         c : flatblockmatc(lacurv(r, ad)),
-        c : gcdgauss(c),
+        a : mat2amat(c),
+        gcdelim(a),
         o : 1,
         do (
+            c : amat2mat(a),
             c1 : flatmatlsc(matmulls(c, r)),
             c1 : addrow(c, c1),
-            c1 : gcdgauss(c1),
-            if length(c1) = length(c) then return('done),
-            c : c1,
+            a : mat2amat(c1),
+            gcdelim(a),
+            if amatr(a) = length(c) then return('done),
             o : o + 1
         ),
-        s : map(gcdnorm, nullspace(echelon(c))),
-        [o, s]
+        l : gcdelim2(a),
+        s : nullspace(amat2mat(a)),
+        [o, l, s]
     );
 
 /* elementary unitary matrix */
