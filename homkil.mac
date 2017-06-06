@@ -354,29 +354,6 @@ riemhom(l, g) :=
         [ad, lc, curv]
     );
 
-/* factor out gcd from vector */
-gcdnorm(v) :=
-    block(
-        [l, n, lgcd],
-        l : transpose(v)[1],
-        n : length(l),
-        lgcd : apply(ezgcd, l),
-        transpose(matrix(lastn(lgcd, n)))
-    );
-
-/* truncate triangularized matrix */
-truncmat(m) :=
-    block(
-        [n, i],
-        n : length(m),
-        i : 1,
-        while i <= n do (
-            if zeromatrixp(m[i]) then return('done),
-            i : i + 1
-        ),
-        firstn(m, i - 1)
-    );
-
 /* dual, i.e. negative transpose of a matrix */
 dualrep(m) :=
     - transpose(m);
