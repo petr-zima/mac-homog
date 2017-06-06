@@ -1,0 +1,159 @@
+/* matrix implemented by Lisp array */
+amatd(a) :=
+    a[0];
+
+amatget(a, i, j) :=
+    block(
+        [d],
+        d : amatd(a),
+        d[i, j]
+    );
+
+amatset(a, i, j, x) :=
+    block(
+        [d],
+        d : amatd(a),
+        d[i, j] : x
+    );
+
+amatr(a) :=
+    a[1];
+
+amatc(a) :=
+    a[2];
+
+amattruncr(a, r) :=
+    if r > amatr(a) then error("amattruncr: too many rows", r)
+    else a[1] : r;
+
+amattruncc(a, c) :=
+    if c > amatc(a) then error("amattruncc: too many columns", c)
+    else a[2] : c;
+
+newamat(r, c) :=
+    block(
+        [a],
+        a : make_array(any, 3),
+        a[0] : make_array(any, r, c),
+        a[1] : r,
+        a[2] : c,
+        a
+    );
+
+copyamat(a) :=
+    block(
+        [a2],
+        a2 : newamat(amatr(a), amatc(a)),
+        fillarray(amatd(a2), amatd(a)),
+        a2
+    );
+
+mat2amat(m) :=
+    block(
+        [r, c, a],
+        r : length(m),
+        if m = 0 then c : 0
+        else c : length(first(m)),
+        a : newamat(r, c),
+        fillarray(amatd(a), flatten(args(m))),
+        a
+    );
+
+amat2mat(a) :=
+    genmatrix(
+        lambda([i, j], amatget(a, i - 1, j - 1)),
+        amatr(a), amatc(a)
+    );
+
+/* gcd which returns [g, u, v, x0, y0], where
+   g = gcd(x, y)
+   u * x + v * y = g
+   x0 * g = x, y0 * g = y */
+gcdex2(x, y) :=
+    block(
+        [g, u, v, x0, y0],
+        [u, v, g] : gcdex(x, y),
+        if g = 0 then (
+            x0 : 1,
+            y0 : 0
+        ) else (
+            x0 : ratsimp(x / g),
+            y0 : ratsimp(y / g)
+        ),
+        [g, u, v, x0, y0]
+    );
+
+/* lcm */
+lcm2(x, y) :=
+    block(
+        [g, u, v],
+        [u, v, g] : gcdex(x, y),
+        if g = 0 then 0
+        else ratsimp(x * y / g)
+    );
+
+/* Gauss elimination with "gcd pivoting" */
+gcdelim_int(a, ajp) :=
+    block(
+        [ip, p, q, x, y, g, u, v, x0, y0],
+        ip : 0,
+        for jp : 0 while ip < amatr(a) and jp < amatc(a) do (
+            for i : ip + 1 while i < amatr(a) do (
+                p : amatget(a, ip, jp),
+                q : amatget(a, i, jp),
+                [g, u, v, x0, y0] : gcdex2(p, q),
+                for j : jp while j < amatc(a) do (
+                    x : amatget(a, ip, j),
+                    y : amatget(a, i, j),
+                    amatset(a, ip, j, ratsimp(u * x + v * y)),
+                    amatset(a, i, j, ratsimp(- y0 * x + x0 * y))
+                )
+            ),
+            if amatget(a, ip, jp) # 0 then (
+                ajp[ip] : jp,
+                ip : ip + 1
+            )
+        ),
+        ip
+    );
+
+gcdelim(a) :=
+    block(
+        [ajp, r],
+        ajp : make_array(any, min(amatr(a), amatc(a))),
+        r : gcdelim_int(a, ajp),
+        amattruncr(a, r)
+    );
+
+gcdelim2_int(a, ajp, r) :=
+    block(
+        [l, jp, p, q, x, y, g, u, v],
+        l : 1,
+        for ip : r - 1 step -1 while ip >= 0 do (
+            jp : ajp[ip],
+            p : amatget(a, ip, jp),
+            l : lcm2(l, p),
+            for j : jp while j < amatc(a) do (
+                x : amatget(a, ip, j),
+                amatset(a, ip, j, ratsimp(x / p))
+            ),
+            for i : ip - 1 step -1 while i >= 0 do (
+                q : amatget(a, i, jp),
+                for j : jp while j < amatc(a) do (
+                    x : amatget(a, ip, j),
+                    y : amatget(a, i, j),
+                    amatset(a, i, j, ratsimp(- x * q + y))
+                )
+            )
+        ),
+        l
+    );
+
+gcdelim2(a) :=
+    block(
+        [ajp, r],
+        ajp : make_array(any, min(amatr(a), amatc(a))),
+        r : gcdelim_int(a, ajp),
+        amattruncr(a, r),
+        gcdelim2_int(a, ajp, r)
+    );
