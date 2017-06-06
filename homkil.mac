@@ -670,7 +670,7 @@ kfsolve(rh, p) :=
             o : o + 1
         ),
         l : gcdelim2(a, ac),
-        s : nullspace(amat2mat(a)),
+        s : amat2mat(gcdsolve(a, ac)),
         [o, l, s]
     );
 
