@@ -60,10 +60,15 @@ mat2amat(m) :=
     );
 
 amat2mat(a) :=
-    genmatrix(
-        lambda([i, j], amatget(a, i - 1, j - 1)),
-        amatr(a), amatc(a)
-    );
+    if amatr(a) = 0 then
+        matrix()
+    elseif amatc(a) = 0 then
+        apply(matrix, makelist([], amatr(a)))
+    else
+        genmatrix(
+            lambda([i, j], amatget(a, i - 1, j - 1)),
+            amatr(a), amatc(a)
+        );
 
 /* gcd for gcdelim */
 gcdfield2(x, y) :=
