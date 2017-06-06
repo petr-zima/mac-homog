@@ -52,7 +52,7 @@ mat2amat(m) :=
     block(
         [r, c, a],
         r : length(m),
-        if m = 0 then c : 0
+        if r = 0 then c : 0
         else c : length(first(m)),
         a : newamat(r, c),
         fillarray(amatd(a), flatten(args(m))),
