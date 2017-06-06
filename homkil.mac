@@ -673,23 +673,26 @@ kfrep(conn, curv, p) :=
 /* solve Killing forms by integrability conditions */
 kfsolve(rh, p) :=
     block(
-        [ad, conn, curv, r, c, c1, a, o, l, s],
+        [ad, conn, curv, r, a, a1, ac, ac1, ma, ma1, o, l, s],
         [ad, conn, curv] : rh,
         r : kfrep(conn, curv, p),
-        c : flatblockmatc(lacurv(r, ad)),
-        a : mat2amat(c),
-        gcdelim(a),
+        a : mat2amat(flatblockmatc(lacurv(r, ad))),
+        ac : gcdelim_ctx(a),
+        gcdelim(a, ac),
         o : 1,
         do (
-            c : amat2mat(a),
-            c1 : flatmatlsc(matmulls(c, r)),
-            c1 : addrow(c, c1),
-            a : mat2amat(c1),
-            gcdelim(a),
-            if amatr(a) = length(c) then return('done),
+            ma : amat2mat(a),
+            ma1 : flatmatlsc(matmulls(ma, r)),
+            ma1 : addrow(ma, ma1),
+            a1 : mat2amat(ma1),
+            ac1 : gcdelim_ctx(a1),
+            gcdelim(a1, ac1),
+            if amatr(a1) = amatr(a) then return('done),
+            a : a1,
+            ac : ac1,
             o : o + 1
         ),
-        l : gcdelim2(a),
+        l : gcdelim2(a, ac),
         s : nullspace(amat2mat(a)),
         [o, l, s]
     );

@@ -93,7 +93,10 @@ lcm2(x, y) :=
     );
 
 /* Gauss elimination with "gcd pivoting" */
-gcdelim_int(a, ajp) :=
+gcdelim_ctx(a) :=
+    make_array(any, min(amatr(a), amatc(a)));
+
+gcdelim(a, ctx) :=
     block(
         [ip, p, q, x, y, g, u, v, x0, y0],
         ip : 0,
@@ -110,27 +113,19 @@ gcdelim_int(a, ajp) :=
                 )
             ),
             if amatget(a, ip, jp) # 0 then (
-                ajp[ip] : jp,
+                ctx[ip] : jp,
                 ip : ip + 1
             )
         ),
-        ip
+        amattruncr(a, ip)
     );
 
-gcdelim(a) :=
-    block(
-        [ajp, r],
-        ajp : make_array(any, min(amatr(a), amatc(a))),
-        r : gcdelim_int(a, ajp),
-        amattruncr(a, r)
-    );
-
-gcdelim2_int(a, ajp, r) :=
+gcdelim2(a, ctx) :=
     block(
         [l, jp, p, q, x, y, g, u, v],
         l : 1,
-        for ip : r - 1 step -1 while ip >= 0 do (
-            jp : ajp[ip],
+        for ip : amatr(a) - 1 step -1 while ip >= 0 do (
+            jp : ctx[ip],
             p : amatget(a, ip, jp),
             l : lcm2(l, p),
             for j : jp while j < amatc(a) do (
@@ -147,13 +142,4 @@ gcdelim2_int(a, ajp, r) :=
             )
         ),
         l
-    );
-
-gcdelim2(a) :=
-    block(
-        [ajp, r],
-        ajp : make_array(any, min(amatr(a), amatc(a))),
-        r : gcdelim_int(a, ajp),
-        amattruncr(a, r),
-        gcdelim2_int(a, ajp, r)
     );
