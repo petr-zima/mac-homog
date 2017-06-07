@@ -100,10 +100,10 @@ lcm2(x, y) :=
     );
 
 /* Gauss elimination with "gcd pivoting" */
-gcdelim_ctx(a) :=
+aelim_ctx(a) :=
     make_array('any, 1 + min(amatr(a), amatc(a)));
 
-gcdelim(a, ctx) :=
+aelim(a, ctx) :=
     block(
         [ip, p, q, x, y, g, u, v, x0, y0],
         ip : 0,
@@ -130,7 +130,7 @@ gcdelim(a, ctx) :=
         amattruncr(a, ip)
     );
 
-gcdelim2(a, ctx) :=
+aelim2(a, ctx) :=
     block(
         [l, jp, p, q, x, y, g, u, v],
         l : 1,
@@ -156,7 +156,7 @@ gcdelim2(a, ctx) :=
         l
     );
 
-gcdsolve1(a, ctx, s, k, ip1, j1) :=
+asolve1(a, ctx, s, k, ip1, j1) :=
     block(
         [jp1, jp],
         jp1 : -1,
@@ -174,7 +174,7 @@ gcdsolve1(a, ctx, s, k, ip1, j1) :=
             amatset(s, j, k, 0)
     );
 
-gcdsolve(a, ctx) :=
+asolve(a, ctx) :=
     block(
         [s, k, jp1, jp],
         s : newamat(amatc(a), amatc(a) - amatr(a)),
@@ -183,7 +183,7 @@ gcdsolve(a, ctx) :=
         for ip : 0 while ip <= amatr(a) do (
             jp : ctx[ip],
             for j : jp1 + 1 while j < jp do (
-                gcdsolve1(a, ctx, s, k, ip, j),
+                asolve1(a, ctx, s, k, ip, j),
                 k : k + 1
             ),
             jp1 : jp
