@@ -1,5 +1,3 @@
-load("amat.mac");
-
 /* number of columns of a matrix */
 numcol(m) :=
     if length(m) = 0 then 0
