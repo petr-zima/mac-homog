@@ -70,20 +70,11 @@ amat2mat(a) :=
             amatr(a), amatc(a)
         );
 
-/* gcd for gcdelim */
-gcdfield2(x, y) :=
-    if x = 0 then (
-        if y = 0 then [0, 1, 0, 1, 0]
-        else [y, 0, 1, 0, 1]
-    ) else [x, 1, 0, 1, ratsimp(y / x)];
-
-gcdelim_gcd : gcdfield2;
-
 /* gcd which returns [g, u, v, x0, y0], where
    g = gcd(x, y)
    u * x + v * y = g
    x0 * g = x, y0 * g = y */
-gcdex2_var : 'x;
+gcdex2_var : 1;
 
 gcdex2(x, y) :=
     block(
@@ -99,17 +90,11 @@ gcdex2(x, y) :=
         [g, u, v, x0, y0]
     );
 
-set_gcdex2('v) :=
-    block(
-        gcdelim_gcd : gcdex2,
-        gcdex2_var : v
-    );
-
 /* lcm */
-gcdelim_lcm(x, y) :=
+lcm2(x, y) :=
     block(
-        [g, u, v, x0, y0],
-        [g, u, v, x0, y0] : gcdelim_gcd(x, y),
+        [g, u, v],
+        [u, v, g] : gcdex(x, y, gcdex2_var),
         if g = 0 then 0
         else ratsimp(x * y / g)
     );
@@ -127,7 +112,7 @@ gcdelim(a, ctx) :=
                 p : amatget(a, ip, jp),
                 q : amatget(a, i, jp),
                 if q # 0 then (
-                    [g, u, v, x0, y0] : gcdelim_gcd(p, q),
+                    [g, u, v, x0, y0] : gcdex2(p, q),
                     for j : jp while j < amatc(a) do (
                         x : amatget(a, ip, j),
                         y : amatget(a, i, j),
@@ -152,7 +137,7 @@ gcdelim2(a, ctx) :=
         for ip : amatr(a) - 1 step -1 while ip >= 0 do (
             jp : ctx[ip],
             p : amatget(a, ip, jp),
-            l : gcdelim_lcm(l, p),
+            l : lcm2(l, p),
             for j : jp while j < amatc(a) do (
                 x : amatget(a, ip, j),
                 amatset(a, ip, j, ratsimp(x / p))
