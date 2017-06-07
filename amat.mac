@@ -33,8 +33,8 @@ amattruncc(a, c) :=
 newamat(r, c) :=
     block(
         [a],
-        a : make_array(any, 3),
-        a[0] : make_array(any, r, c),
+        a : make_array('any, 3),
+        a[0] : make_array('any, r, c),
         a[1] : r,
         a[2] : c,
         a
@@ -63,7 +63,7 @@ amat2mat(a) :=
     if amatr(a) = 0 then
         matrix()
     elseif amatc(a) = 0 then
-        apply(matrix, makelist([], amatr(a)))
+        apply('matrix, makelist([], amatr(a)))
     else
         genmatrix(
             lambda([i, j], amatget(a, i - 1, j - 1)),
@@ -101,7 +101,7 @@ lcm2(x, y) :=
 
 /* Gauss elimination with "gcd pivoting" */
 gcdelim_ctx(a) :=
-    make_array(any, 1 + min(amatr(a), amatc(a)));
+    make_array('any, 1 + min(amatr(a), amatc(a)));
 
 gcdelim(a, ctx) :=
     block(
