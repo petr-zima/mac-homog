@@ -6,7 +6,7 @@ RM=rm -f
 INSTALL=install
 
 %.o: %.mac
-	$(MAXIMA) --batch-string=compile_file\(\"$<\"\)\;
+	$(MAXIMA) --init= --batch-string=compile_file\(\"$<\"\)\;
 
 all: $(OBJS)
 
