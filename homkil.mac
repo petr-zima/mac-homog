@@ -672,6 +672,74 @@ kfsolve (rh, p) :=
         [o, l, s]
     );
 
+/* check complex structure */
+checkcplx (J) :=
+    block (
+        [IJ],
+        IJ : ident (length (J)) + J . J,
+        if zeromatrixp (IJ) then return (true),
+        print (box ("Not a complex structure, obstruction:")),
+        print (IJ),
+        false
+    );
+
+/* contact distribution and its complement */
+contactsplit (J) :=
+    block (
+        [J2, IJ2, a, d, z],
+        J2 : J . J,
+        IJ2 : ident (length (J)) + J2,
+        a : mat2amat (transpose (-J2)),
+        aelim (a, aelim_ctx (a)),
+        d : transpose (amat2mat (a)),
+        a : mat2amat (transpose (IJ2)),
+        aelim (a, aelim_ctx (a)),
+        z : transpose (amat2mat (a)),
+        [IJ2, d, z]
+    );
+
+/* check contact structure */
+checkcontact (J, IJ2, d, z) :=
+    block (
+        [n, dn, zn, Jdz],
+        [n, dn, zn] : [length (J), numcol (d), numcol (z)],
+        if zn # 1 or zn + dn # n then (
+            print (box ("Wrong dimensions of contact structure:")),
+            print (n, dn, zn),
+            return (false)
+        ),
+        Jdz : addcol (IJ2 . d, J . z),
+        if zeromatrixp (Jdz) then return (true),
+        print (box ("Not a contact structure, obstruction:")),
+        print (Jdz),
+        false
+    );
+
+/* complementary maximal isotropic subspaces */
+isotrop (J, d) :=
+    block (
+        [i, a, dp, dn],
+        i : %i * ident (length (J)),
+        a : mat2amat (transpose ((J + i) . d)),
+        aelim (a, aelim_ctx (a)),
+        dp : transpose (amat2mat (a)),
+        a : mat2amat (transpose ((J - i) . d)),
+        aelim (a, aelim_ctx (a)),
+        dn : transpose (amat2mat (a)),
+        [dp, dn]
+    );
+
+/* check Hermitian or contact metric */
+checkhermit (g, J) :=
+    block (
+        [gJ],
+        gJ : transpose (J) . g + g . J,
+        if zeromatrixp (gJ) then return (true),
+        print (box ("Not a Hermitian or contact metric, obstruction:")),
+        print (gJ),
+        false
+    );
+
 /* elementary unitary matrix */
 eumat (n, x, i, j) :=
     block (
