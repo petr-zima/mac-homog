@@ -720,10 +720,10 @@ isotrop (J, d) :=
     block (
         [i, a, dp, dn],
         i : %i * ident (length (J)),
-        a : mat2amat (transpose ((J + i) . d)),
+        a : mat2amat (transpose ((J + i) . d / 2)),
         aelim (a, aelim_ctx (a)),
         dp : transpose (amat2mat (a)),
-        a : mat2amat (transpose ((J - i) . d)),
+        a : mat2amat (transpose ((J - i) . d / 2)),
         aelim (a, aelim_ctx (a)),
         dn : transpose (amat2mat (a)),
         [dp, dn]
@@ -738,6 +738,127 @@ checkhermit (g, J) :=
         print (box ("Not a Hermitian or contact metric, obstruction:")),
         print (gJ),
         false
+    );
+
+/* count one bits in integer */
+bit_countones (i, m) :=
+    block (
+        [c],
+        c : 0,
+        for j : 0 while j < m do
+            if bit_onep (i, j) then c : c + 1,
+        c
+    );
+
+/* Clifford algebra in standard basis */
+stdcliffpos (i, m, bm) :=
+    block (
+        [bi],
+        i : i - 1,
+        bi : bit_lsh (1, i),
+        genmatrix (
+            lambda ([j, k],
+                k : k - 1,
+                if bit_xor (j - 1, k, bi) = 0
+                        and bit_and (k, bi) = 0 then
+                    - (-1) ^ bit_countones (k, i)
+                else 0
+            ),
+            bm, bm
+        )
+    );
+
+stdcliffneg (i, m, bm) :=
+    block (
+        [bi],
+        i : i - 1,
+        bi : bit_lsh (1, i),
+        genmatrix (
+            lambda ([j, k],
+                k : k - 1,
+                if bit_xor (j - 1, k, bi) = 0
+                        and bit_and (k, bi) # 0 then
+                    2 * (-1) ^ bit_countones (k, i)
+                else 0
+            ),
+            bm, bm
+        )
+    );
+
+stdcliffzero (m, bm) :=
+    genmatrix (
+        lambda ([j, k],
+            if j = k then
+                %i * (-1) ^ bit_countones (k - 1, m)
+            else 0
+        ),
+        bm, bm
+    );
+
+stdcliffeven (n) :=
+    block (
+        [m, bm],
+        m : n / 2,
+        bm : bit_lsh (1, m),
+        genmatrix (
+            lambda ([j, k],
+                if k <= m then stdcliffpos (k, m, bm)
+                else stdcliffneg (k - m, m, bm)
+            ),
+            1, n
+        )
+    );
+
+stdcliffodd (n) :=
+    block (
+        [m2, m],
+        m2 : n - 1,
+        m : m2 / 2,
+        bm : bit_lsh (1, m),
+        genmatrix (
+            lambda ([j, k],
+                if k <= m then stdcliffpos (k, m, bm)
+                elseif k <= m2 then stdcliffneg (k - m, m, bm)
+                else stdcliffzero (m, bm)
+            ),
+            1, n
+        )
+    );
+
+/* Clifford algebra for general metric */
+cliffeven (n, g, J) :=
+    block (
+        [dp, dn, dntg, cp, cn],
+        if not checkhermit (g, J) then return (false),
+        if not checkcplx (J) then return (false),
+        [dp, dn] : isotrop (J, ident (n)),
+        dntg : transpose (dn) . g,
+        cp : ((dntg . dp) ^^ -1) . dntg,
+        cn : transpose (dp) . g,
+        stdcliffeven (n) . addrow (cp, cn)
+    );
+
+cliffodd (n, g, J) :=
+    block (
+        [IJ2, d, z, ztg, dp, dn, dntg, cp, cn, c0],
+        if not checkhermit (g, J) then return (false),
+        [IJ2, d, z] : contactsplit (J),
+        if not checkcontact (J, IJ2, d, z) then return (false),
+        [dp, dn] : isotrop (J, d),
+        dntg : transpose (dn) . g,
+        cp : ((dntg . dp) ^^ -1) . dntg,
+        cn : transpose (dp) . g,
+        ztg : transpose (z) . g,
+        c0 : ztg / sqrt (ztg . z),
+        stdcliffodd (n) . addrow (cp, cn, c0)
+    );
+
+cliff (g, J) :=
+    block (
+        [n],
+        n : length (g),
+        if evenp (n) then cliffeven (n, g, J)
+        else cliffodd (n, g, J)
     );
 
 /* elementary unitary matrix */
