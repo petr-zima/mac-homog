@@ -346,7 +346,7 @@ checklctors (tors) :=
    curv = curvature of lc */
 riemhom (l, g) :=
     block (
-        [n, ad, adspl, hc, aff, blcurv, acurv, tors, lc],
+        [n, ad, adspl, hc, aff, blcurv, acurv, tors, lc, curv],
         n : length (g),
         ad : adjrep (l),
         if not checkla (l, ad) then return (false),
