@@ -904,20 +904,20 @@ cliff (g, J) :=
 
 /* spin representation of a matrix (in LA sense) */
 spinrep (m, g, c) :=
-    blockmatmul (c, - m . (g ^^ -1) . transpose (c) / 4);
+    blockmatmul (c, - m . (g ^^ -1) . transpose (c) / 4) [1, 1];
 
 spinrepls (l, g, c) :=
     block (
         [gc],
         gc : - (g ^^ -1) . transpose (c) / 4,
-        map (lambda ([m], blockmatmul (c, m . gc)), l)
+        map (lambda ([m], blockmatmul (c, m . gc) [1, 1]), l)
     );
 
 spinrepmat (b, g, c) :=
     block (
         [gc],
         gc : - (g ^^ -1) . transpose (c) / 4,
-        matrixmap (lambda ([m], blockmatmul (c, m . gc)), b)
+        matrixmap (lambda ([m], blockmatmul (c, m . gc)) [1, 1], b)
     );
 
 /* elementary skew symmetric matrix */
