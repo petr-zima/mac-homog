@@ -895,6 +895,22 @@ spinrepmat (b, g, c) :=
         matrixmap (lambda ([m], blockmatmul (c, m . gc)), b)
     );
 
+/* elementary skew symmetric matrix */
+esomat (n, x, i, j) :=
+    ematrix (n, n, x, i, j) - ematrix (n, n, x, j, i);
+
+/* orthogonal LA */
+sola (n) :=
+    apply (append,
+        makelist (
+            makelist (
+                esomat (n, 1, i, j),
+                i, j - 1
+            ),
+            j, n
+        )
+    );
+
 /* elementary unitary matrix */
 eumat (n, x, i, j) :=
     block (
