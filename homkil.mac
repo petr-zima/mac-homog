@@ -56,6 +56,22 @@ matmulls (m, l) :=
         a
     );
 
+/* multiply 2 block matrices */
+blockmatmul (m1, m2) :=
+    map (
+        lambda ([r1],
+            apply ("+",
+                map (
+                    lambda ([e1, r2],
+                        map (lambda ([e2], e1 . e2), r2)
+                    ),
+                    r1, args (m2)
+                )
+            )
+        ),
+        m1
+    );
+
 /* linear combination given by a column vector */
 collincomb (c, b) :=
     block (
@@ -859,6 +875,24 @@ cliff (g, J) :=
         n : length (g),
         if evenp (n) then cliffeven (n, g, J)
         else cliffodd (n, g, J)
+    );
+
+/* spin representation of a matrix (in LA sense) */
+spinrep (m, g, c) :=
+    blockmatmul (c, - m . (g ^^ -1) . transpose (c) / 4);
+
+spinrepls (l, g, c) :=
+    block (
+        [gc],
+        gc : - (g ^^ -1) . transpose (c) / 4,
+        map (lambda ([m], blockmatmul (c, m . gc)), l)
+    );
+
+spinrepmat (b, g, c) :=
+    block (
+        [gc],
+        gc : - (g ^^ -1) . transpose (c) / 4,
+        matrixmap (lambda ([m], blockmatmul (c, m . gc)), b)
     );
 
 /* elementary unitary matrix */
