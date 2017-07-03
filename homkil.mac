@@ -368,6 +368,31 @@ riemhom (l, g) :=
         [g, ad, lc, curv]
     );
 
+/* solve overdetermined system by integrability conditions */
+lasolve (r, ad) :=
+    block (
+        [a, a1, ac, ac1, ma, ma1, o, l, s],
+        a : mat2amat (flatblockmatc (lacurv (r, ad))),
+        ac : aelim_ctx (a),
+        aelim (a, ac),
+        o : 1,
+        do (
+            ma : amat2mat (a),
+            ma1 : flatmatlsc (matmulls (ma, r)),
+            ma1 : addrow (ma, ma1),
+            a1 : mat2amat (ma1),
+            ac1 : aelim_ctx (a1),
+            aelim (a1, ac1),
+            if amatr (a1) = amatr (a) then return ('done),
+            a : a1,
+            ac : ac1,
+            o : o + 1
+        ),
+        l : aelim2 (a, ac),
+        s : amat2mat (asolve (a, ac)),
+        [o, l, s]
+    );
+
 /* dual, i.e. negative transpose of a matrix */
 dualrep (m) :=
     - transpose (m);
@@ -664,28 +689,9 @@ kfrep (conn, curv, p) :=
 /* solve Killing forms by integrability conditions */
 kfsolve (rh, p) :=
     block (
-        [g, ad, conn, curv, r, a, a1, ac, ac1, ma, ma1, o, l, s],
+        [g, ad, conn, curv],
         [g, ad, conn, curv] : firstn (rh, 4),
-        r : kfrep (conn, curv, p),
-        a : mat2amat (flatblockmatc (lacurv (r, ad))),
-        ac : aelim_ctx (a),
-        aelim (a, ac),
-        o : 1,
-        do (
-            ma : amat2mat (a),
-            ma1 : flatmatlsc (matmulls (ma, r)),
-            ma1 : addrow (ma, ma1),
-            a1 : mat2amat (ma1),
-            ac1 : aelim_ctx (a1),
-            aelim (a1, ac1),
-            if amatr (a1) = amatr (a) then return ('done),
-            a : a1,
-            ac : ac1,
-            o : o + 1
-        ),
-        l : aelim2 (a, ac),
-        s : amat2mat (asolve (a, ac)),
-        [o, l, s]
+        lasolve (kfrep (conn, curv, p), ad)
     );
 
 /* standard complex or contact structure */
