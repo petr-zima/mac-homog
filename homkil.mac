@@ -976,11 +976,12 @@ ula (n) :=
     );
 
 /* Berger sphere */
-bergs (m) :=
+bergs (m, s) :=
     block (
-        [l, n, g],
+        [l, n, g, J],
         l : ula (m),
         n : 2 * m - 1,
         g : ident (n) + ematrix (n, n, s - 1, 1, 1),
-        ratsimp (riemhom (l, g))
+        J : stdJ (n),
+        ratsimp (spinhom (riemhom (l, g), J))
     );
