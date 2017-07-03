@@ -340,7 +340,7 @@ checklctors (tors) :=
    l = basis of a LA split to V + h
    g = metric on V
 
-   returns [ad, lc, curv];
+   returns [g, ad, lc, curv];
    ad = adjoint representation of l
    lc = Levi-Civita connection
    curv = curvature of lc */
@@ -365,7 +365,7 @@ riemhom (l, g) :=
         tors : acurv [2] [1],
         if not checklctors (tors) then return (false),
         curv : acurv [2] [2],
-        [ad, lc, curv]
+        [g, ad, lc, curv]
     );
 
 /* dual, i.e. negative transpose of a matrix */
@@ -664,8 +664,8 @@ kfrep (conn, curv, p) :=
 /* solve Killing forms by integrability conditions */
 kfsolve (rh, p) :=
     block (
-        [ad, conn, curv, r, a, a1, ac, ac1, ma, ma1, o, l, s],
-        [ad, conn, curv] : rh,
+        [g, ad, conn, curv, r, a, a1, ac, ac1, ma, ma1, o, l, s],
+        [g, ad, conn, curv] : firstn (rh, 4),
         r : kfrep (conn, curv, p),
         a : mat2amat (flatblockmatc (lacurv (r, ad))),
         ac : aelim_ctx (a),
