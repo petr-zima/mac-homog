@@ -908,6 +908,15 @@ cliff (g, J) :=
         else cliffodd (n, g, J)
     );
 
+/* prepare spin homogeneous space from [rh, J];
+   r = [g, ad, conn, curv] = Riemannian homogeneous space
+   J = complex or contact structure for constructing spinors
+
+   returns [g, ad, lc, curv, c];
+   c = Clifford algebra */
+spinhom (rh, J) :=
+    append (rh, [cliff (first (rh), J)]);
+
 /* spin representation of a matrix (in LA sense) */
 spinrep (m, g, c) :=
     blockmatmul (c, - m . (g ^^ -1) . transpose (c) / 4) [1, 1];
