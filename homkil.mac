@@ -688,6 +688,31 @@ kfsolve (rh, p) :=
         [o, l, s]
     );
 
+/* standard complex or contact structure */
+stdJ (n) :=
+    block (
+        [m],
+        m : floor (n / 2),
+        if evenp (n) then
+            genmatrix (
+                lambda ([i, j],
+                    if j = m + i then 1
+                    elseif i = m + j then -1
+                    else 0
+                ),
+                n, n
+            )
+        else
+            genmatrix (
+                lambda ([i, j],
+                    if j = m + i and i > 1 then 1
+                    elseif i = m + j and j > 1 then -1
+                    else 0
+                ),
+                n, n
+            )
+    );
+
 /* check complex structure */
 checkcplx (J) :=
     block (
