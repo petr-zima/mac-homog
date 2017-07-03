@@ -388,7 +388,7 @@ lasolve (r, ad) :=
             ac : ac1,
             o : o + 1
         ),
-        l : aelim2 (a, ac),
+        l : factor (aelim2 (a, ac)),
         s : amat2mat (asolve (a, ac)),
         [o, l, s]
     );
