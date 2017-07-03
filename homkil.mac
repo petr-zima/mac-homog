@@ -935,6 +935,28 @@ spinrepmat (b, g, c) :=
         matrixmap (lambda ([m], blockmatmul (c, m . gc)) [1, 1], b)
     );
 
+/* representation on Killing spinors */
+ksrep (conn, g, c, a) :=
+    block (
+        [m, n, conns],
+        m : length (conn),
+        n : length (curv),
+        conns : spinrepls (conn, g, c),
+        makelist (
+            conns [i]
+            - if i <= n then a * c [1, i] else 0,
+            i, m
+        )
+    );
+
+/* solve Killing spinors by integrability conditions */
+kssolve (sh, a) :=
+    block (
+        [g, ad, conn, curv, c],
+        [g, ad, conn, curv, c] : firstn (sh, 5),
+        lasolve (ksrep (conn, g, c, a), ad)
+    );
+
 /* elementary skew symmetric matrix */
 esomat (n, x, i, j) :=
     ematrix (n, n, x, i, j) - ematrix (n, n, x, j, i);
