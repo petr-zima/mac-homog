@@ -648,13 +648,38 @@ intp (v, p) :=
 curvext1 (curvps, v, p, ids) :=
     block (
         [n, vc],
-        n : length (v),
+        n : length (curvps),
         vc : transpose (v) . curvps,
         apply ("+", makelist (
             block (
                 [ei],
                 ei : evect (i, n),
                 tenprod (extp (ei, p), ids) . (vc . ei)
+            ),
+            i, n
+        ))
+    );
+
+/* totally skew-symmetrized action of curvature */
+curvext2 (curvps, p, ids) :=
+    block (
+        [n, p1],
+        n : length (curvps),
+        p1 : p + 1,
+        apply ("+", makelist (
+            block (
+                [ei, eic],
+                ei : evect (i, n),
+                eic : transpose (ei) . curvps,
+                tenprod (extp (ei, p1), ids)
+                . apply ("+", makelist (
+                    block (
+                        [ej],
+                        ej : evect (j, n),
+                        tenprod (extp (ej, p), ids) . (eic . ej)
+                    ),
+                    j, n
+                ))
             ),
             i, n
         ))
@@ -682,7 +707,7 @@ kfrep (conn, curv, p) :=
             b11 : connp [i],
             b22 : connp1 [i],
             b12 : - intp (ei, p1),
-            b21 : - 1/p * curvext1 (curvp, ei, p, ids),
+            b21 : - 1 / p * curvext1 (curvp, ei, p, ids),
             b : addrow (
                 addcol (b11, b12),
                 addcol (b21, b22)
@@ -983,14 +1008,15 @@ tenprodrepmat (b1, b2) :=
 /* representation on Killing spinor-valued forms */
 ksfrep (conn, curv, g, c, p) :=
     block (
-        [m, n, p1, ids,
+        [m, n, p1, p2, ids,
         connd, connp, connp1, conns, connps, connp1s,
-        curvd, curvp, curvs, curvps,
+        curvd, curvp, curvs, curvps, ce2,
         a, b, b11, b12, b21, b22, ei],
         print ("Preparing Killing representation"),
         m : length (conn),
         n : length (curv),
         p1 : p + 1,
+        p2 : p + 2,
         ids : ident (length (c [1, 1])),
         connd : dualrepls (conn),
         connp : extrepls (connd, p),
@@ -1002,13 +1028,17 @@ ksfrep (conn, curv, g, c, p) :=
         curvp : extrepmat (curvd, p),
         curvs : spinrepmat (curv, g, c),
         curvps : tenprodrepmat (curvp, curvs),
+        ce2 : 1 / p1 * curvext2 (curvps, p, ids),
         a : [],
         for i : 1 thru m do (
             ei : evect (i, n),
             b11 : connps [i],
             b22 : connp1s [i],
             b12 : - tenprod (intp (ei, p1), ids),
-            b21 : - 1/p * curvext1 (curvps, ei, p, ids),
+            b21 : - 1 / p * (
+                curvext1 (curvps, ei, p, ids)
+                - tenprod (intp (ei, p2), ids) . ce2
+            ),
             b : addrow (
                 addcol (b11, b12),
                 addcol (b21, b22)
