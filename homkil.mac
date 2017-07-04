@@ -957,6 +957,47 @@ kssolve (sh, a) :=
         lasolve (ksrep (conn, g, c, a), ad)
     );
 
+/* tensor product of two matrices */
+tenprod (m1, m2) :=
+    apply (matrix,
+        apply (append,
+            map (
+                lambda ([r1],
+                    map (
+                        lambda ([r2],
+                            apply (append,
+                                map (
+                                    lambda ([e1],
+                                        map (
+                                            lambda ([e2],
+                                                e1 * e2
+                                            ),
+                                            r2
+                                        )
+                                    ),
+                                    r1
+                                )
+                            )
+                        ),
+                        args (m2)
+                    )
+                ),
+                args (m1)
+            )
+        )
+    );
+
+/* tensor product representation (in LA sense) */
+tenprodrep (m1, m2) :=
+    tenprod (m1, ident (length (m2)))
+    + tenprod (ident (length (m1)), m2);
+
+tenprodrepls (l1, l2) :=
+    map (tenprodrep, l1, l2);
+
+tenprodrepmat (b1, b2) :=
+    map (tenprodrepls, b1, b2);
+
 /* elementary skew symmetric matrix */
 esomat (n, x, i, j) :=
     ematrix (n, n, x, i, j) - ematrix (n, n, x, j, i);
