@@ -639,19 +639,19 @@ intp (v, p) :=
         a
     );
 
-/* skew-symmetrized action of curvature */
-curvext (curvp, v, p) :=
+/* partially skew-symmetrized action of curvature */
+curvext1 (curvps, v, p, ids) :=
     block (
         [n, p1, np, np1, vc, a, ei, b],
         n : length (v),
         p1 : p + 1,
         np : binomial (n, p),
         np1 : binomial (n, p1),
-        vc : transpose (v) . curvp,
-        a : zeromatrix (np1, np),
+        vc : transpose (v) . curvps,
+        a : tenprod (zeromatrix (np1, np), ids),
         for i : 1 thru n do (
             ei : evect (i, n),
-            b : extp (ei, p) . (vc . ei),
+            b : tenprod (extp (ei, p), ids) . (vc . ei),
             a : a + b
         ),
         a
@@ -660,11 +660,13 @@ curvext (curvp, v, p) :=
 /* representation on Killing forms */
 kfrep (conn, curv, p) :=
     block (
-        [m, n, p1, connd, connp, connp1, curvd, curvp,
+        [m, n, p1, ids,
+        connd, connp, connp1, curvd, curvp,
         a, b, b11, b12, b21, b22, ei],
         m : length (conn),
         n : length (curv),
         p1 : p + 1,
+        ids : ident (1),
         connd : dualrepls (conn),
         connp : extrepls (connd, p),
         connp1 : extrepls (connd, p1),
@@ -676,7 +678,7 @@ kfrep (conn, curv, p) :=
             b11 : connp [i],
             b22 : connp1 [i],
             b12 : - intp (ei, p1),
-            b21 : - 1/p * curvext (curvp, ei, p),
+            b21 : - 1/p * curvext1 (curvp, ei, p, ids),
             b : addrow (
                 addcol (b11, b12),
                 addcol (b21, b22)
@@ -1000,7 +1002,7 @@ ksfrep (conn, curv, g, c, p) :=
             b11 : connps [i],
             b22 : connp1s [i],
             b12 : - tenprod (intp (ei, p1), ids),
-            b21 : - 1/p * tenprod (curvext (curvp, ei, p), ids),
+            b21 : - 1/p * curvext1 (curvps, ei, p, ids),
             b : addrow (
                 addcol (b11, b12),
                 addcol (b21, b22)
