@@ -1005,8 +1005,43 @@ tenprodrepls (l1, l2) :=
 tenprodrepmat (b1, b2) :=
     map (tenprodrepls, b1, b2);
 
+/* partially skew-symmetrized square of Killing homomorphism */
+kilh2ext1 (A, v, p, ids) :=
+    block (
+        [n, Av],
+        n : numcol (A),
+        Av : A . v,
+        apply ("+", makelist (
+            block (
+                [ei, Aei],
+                ei : evect (i, n),
+                Aei : A . ei,
+                tenprod (extp (ei, p), ids) . (Av . Aei)
+            ),
+            i, n
+        ))
+    );
+
+/* shift Kiling homomorphism up to order p + 1 */
+kilhup (A, v, p, ids) :=
+    block (
+        [n, p1, Av],
+        n : numcol (A),
+        p1 : p + 1,
+        Av : A . v,
+        1 / p1 * apply ("+", makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (extp (ei, p), ids) . Av
+                . tenprod (intp (ei, p1), ids)
+            ),
+            i, n
+        ))
+    );
+
 /* representation on Killing spinor-valued forms */
-ksfrep (conn, curv, g, c, p) :=
+ksfrep (conn, curv, g, c, p, A) :=
     block (
         [m, n, p1, p2, ids,
         connd, connp, connp1, conns, connps, connp1s,
@@ -1032,11 +1067,13 @@ ksfrep (conn, curv, g, c, p) :=
         a : [],
         for i : 1 thru m do (
             ei : evect (i, n),
-            b11 : connps [i],
-            b22 : connp1s [i],
+            b11 : connps [i] - A . ei,
+            b22 : connp1s [i]
+                - 1 / p * kilhup (A, ei, p, ids),
             b12 : - tenprod (intp (ei, p1), ids),
             b21 : - 1 / p * (
                 curvext1 (curvps, ei, p, ids)
+                + kilh2ext1 (A, ei, p, ids)
                 - tenprod (intp (ei, p2), ids) . ce2
             ),
             b : addrow (
@@ -1049,11 +1086,47 @@ ksfrep (conn, curv, g, c, p) :=
     );
 
 /* solve Killing spinor-valued forms by integrability conditions */
-ksfsolve (sh, p) :=
+ksfsolve (sh, p, A) :=
     block (
         [g, ad, conn, curv, c],
         [g, ad, conn, curv, c] : firstn (sh, 5),
-        lasolve (ksfrep (conn, curv, g, c, p), ad)
+        lasolve (ksfrep (conn, curv, g, c, p, A), ad)
+    );
+
+/* standard Killing homomorphism */
+stdkilh (c, p) :=
+    block (
+        [n, p1, idp, ids, cext],
+        n : numcol (c),
+        p1 : p + 1,
+        idp : ident (binomial (n, p)),
+        ids : ident (length (c [1, 1])),
+        cext : apply ("+", makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (extp (ei, p), c [1, i])
+            ),
+            i, n
+        )),
+        matrix (makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (idp, c [1, i])
+                - 1 / p1 * tenprod (intp (ei, p1), ids) . cext
+            ),
+            i, n
+        ))
+    );
+
+/* solve standard Killing spinor-valued forms */
+stdksfsolve (sh, p, a) :=
+    block (
+        [g, ad, conn, curv, c, A],
+        [g, ad, conn, curv, c] : firstn (sh, 5),
+        A : a * stdkilh (c, p),
+        ksfsolve (sh, p, A)
     );
 
 /* elementary skew symmetric matrix */
