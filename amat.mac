@@ -79,7 +79,7 @@ gcdex2_var : 1;
 gcdex2 (x, y) :=
     block (
         [g, u, v, x0, y0],
-        [u, v, g] : gcdex (x, y, gcdex2_var),
+        [u, v, g] : ratsimp (gcdex (x, y, gcdex2_var)),
         if g = 0 then (
             x0 : 1,
             y0 : 0
@@ -94,7 +94,7 @@ gcdex2 (x, y) :=
 lcm2 (x, y) :=
     block (
         [g, u, v],
-        [u, v, g] : gcdex (x, y, gcdex2_var),
+        [u, v, g] : ratsimp (gcdex (x, y, gcdex2_var)),
         if g = 0 then 0
         else ratsimp (x * y / g)
     );
