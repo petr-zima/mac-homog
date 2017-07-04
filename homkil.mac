@@ -372,15 +372,19 @@ riemhom (l, g) :=
 lasolve (r, ad) :=
     block (
         [a, a1, ac, ac1, ma, ma1, o, l, s],
+        print ("Computing LA curvature"),
         a : mat2amat (flatblockmatc (lacurv (r, ad))),
+        print ("Elimination pass", 0),
         ac : aelim_ctx (a),
         aelim (a, ac),
         o : 1,
         do (
+            print ("Multiplication pass", o),
             ma : amat2mat (a),
             ma1 : flatmatlsc (matmulls (ma, r)),
             ma1 : addrow (ma, ma1),
             a1 : mat2amat (ma1),
+            print ("Elimination pass", o),
             ac1 : aelim_ctx (a1),
             aelim (a1, ac1),
             if amatr (a1) = amatr (a) then return ('done),
@@ -388,6 +392,7 @@ lasolve (r, ad) :=
             ac : ac1,
             o : o + 1
         ),
+        print ("Solving"),
         l : factor (aelim2 (a, ac)),
         s : amat2mat (asolve (a, ac)),
         [o, l, s]
@@ -661,6 +666,7 @@ kfrep (conn, curv, p) :=
         [m, n, p1, ids,
         connd, connp, connp1, curvd, curvp,
         a, b, b11, b12, b21, b22, ei],
+        print ("Preparing Killing representation"),
         m : length (conn),
         n : length (curv),
         p1 : p + 1,
@@ -914,6 +920,7 @@ spinrepmat (b, g, c) :=
 ksrep (conn, g, c, a) :=
     block (
         [m, n, conns],
+        print ("Preparing Killing representation"),
         m : length (conn),
         n : length (curv),
         conns : spinrepls (conn, g, c),
@@ -980,6 +987,7 @@ ksfrep (conn, curv, g, c, p) :=
         connd, connp, connp1, conns, connps, connp1s,
         curvd, curvp, curvs, curvps,
         a, b, b11, b12, b21, b22, ei],
+        print ("Preparing Killing representation"),
         m : length (conn),
         n : length (curv),
         p1 : p + 1,
