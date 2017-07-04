@@ -973,6 +973,51 @@ tenprodrepls (l1, l2) :=
 tenprodrepmat (b1, b2) :=
     map (tenprodrepls, b1, b2);
 
+/* representation on Killing spinor-valued forms */
+ksfrep (conn, curv, g, c, p) :=
+    block (
+        [m, n, p1, ids,
+        connd, connp, connp1, conns, connps, connp1s,
+        curvd, curvp, curvs, curvps,
+        a, b, b11, b12, b21, b22, ei],
+        m : length (conn),
+        n : length (curv),
+        p1 : p + 1,
+        ids : ident (length (c [1, 1])),
+        connd : dualrepls (conn),
+        connp : extrepls (connd, p),
+        connp1 : extrepls (connd, p1),
+        conns : spinrepls (conn, g, c),
+        connps : tenprodrepls (connp, conns),
+        connp1s : tenprodrepls (connp1, conns),
+        curvd : dualrepmat (curv),
+        curvp : extrepmat (curvd, p),
+        curvs : spinrepmat (curv, g, c),
+        curvps : tenprodrepmat (curvp, curvs),
+        a : [],
+        for i : 1 thru m do (
+            ei : evect (i, n),
+            b11 : connps [i],
+            b22 : connp1s [i],
+            b12 : - tenprod (intp (ei, p1), ids),
+            b21 : - 1/p * tenprod (curvext (curvp, ei, p), ids),
+            b : addrow (
+                addcol (b11, b12),
+                addcol (b21, b22)
+            ),
+            a : endcons (b, a)
+        ),
+        a
+    );
+
+/* solve Killing spinor-valued forms by integrability conditions */
+ksfsolve (sh, p) :=
+    block (
+        [g, ad, conn, curv, c],
+        [g, ad, conn, curv, c] : firstn (sh, 5),
+        lasolve (ksfrep (conn, curv, g, c, p), ad)
+    );
+
 /* elementary skew symmetric matrix */
 esomat (n, x, i, j) :=
     ematrix (n, n, x, i, j) - ematrix (n, n, x, j, i);
