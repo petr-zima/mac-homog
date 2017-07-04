@@ -642,19 +642,17 @@ intp (v, p) :=
 /* partially skew-symmetrized action of curvature */
 curvext1 (curvps, v, p, ids) :=
     block (
-        [n, p1, np, np1, vc, a, ei, b],
+        [n, vc],
         n : length (v),
-        p1 : p + 1,
-        np : binomial (n, p),
-        np1 : binomial (n, p1),
         vc : transpose (v) . curvps,
-        a : tenprod (zeromatrix (np1, np), ids),
-        for i : 1 thru n do (
-            ei : evect (i, n),
-            b : tenprod (extp (ei, p), ids) . (vc . ei),
-            a : a + b
-        ),
-        a
+        apply ("+", makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (extp (ei, p), ids) . (vc . ei)
+            ),
+            i, n
+        ))
     );
 
 /* representation on Killing forms */
