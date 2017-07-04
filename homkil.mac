@@ -907,7 +907,7 @@ spinrepmat (b, g, c) :=
     block (
         [gc],
         gc : - (g ^^ -1) . transpose (c) / 4,
-        matrixmap (lambda ([m], blockmatmul (c, m . gc)) [1, 1], b)
+        matrixmap (lambda ([m], blockmatmul (c, m . gc) [1, 1]), b)
     );
 
 /* representation on Killing spinors */
