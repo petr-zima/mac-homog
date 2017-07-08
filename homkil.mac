@@ -1005,21 +1005,12 @@ tenprodrepls (l1, l2) :=
 tenprodrepmat (b1, b2) :=
     map (tenprodrepls, b1, b2);
 
-/* partially skew-symmetrized square of Killing homomorphism */
-kilh2ext1 (A, v, p, ids) :=
+/* skew-symmetrized square of Killing homomorphism */
+kilh2ext (A) :=
     block (
-        [n, Av],
-        n : numcol (A),
-        Av : A . v,
-        apply ("+", makelist (
-            block (
-                [ei, Aei],
-                ei : evect (i, n),
-                Aei : A . ei,
-                tenprod (extp (ei, p), ids) . (Av . Aei)
-            ),
-            i, n
-        ))
+        [A2],
+        A2 : blockmatmul (transpose (A), A),
+        A2 - transpose (A2)
     );
 
 /* shift Kiling homomorphism up to order p + 1 */
@@ -1045,7 +1036,7 @@ ksfrep (conn, curv, g, c, p, A) :=
     block (
         [m, n, p1, p2, ids,
         connd, connp, connp1, conns, connps, connp1s,
-        curvd, curvp, curvs, curvps, ce2,
+        curvd, curvp, curvs, curvps, khcurvps, khce2,
         a, b, b11, b12, b21, b22, ei],
         print ("Preparing Killing representation"),
         m : length (conn),
@@ -1063,18 +1054,17 @@ ksfrep (conn, curv, g, c, p, A) :=
         curvp : extrepmat (curvd, p),
         curvs : spinrepmat (curv, g, c),
         curvps : tenprodrepmat (curvp, curvs),
-        ce2 : 1 / p1 * curvext2 (curvps, p, ids),
+        khcurvps : curvps + kilh2ext (A),
+        khce2 : 1 / 2 / p1 * curvext2 (khcurvps, p, ids),
         a : [],
         for i : 1 thru m do (
             ei : evect (i, n),
             b11 : connps [i] - A . ei,
-            b22 : connp1s [i]
-                - 1 / p * kilhup (A, ei, p, ids),
+            b22 : connp1s [i] - kilhup (A, ei, p, ids),
             b12 : - tenprod (intp (ei, p1), ids),
             b21 : - 1 / p * (
-                curvext1 (curvps, ei, p, ids)
-                + kilh2ext1 (A, ei, p, ids)
-                - tenprod (intp (ei, p2), ids) . ce2
+                curvext1 (khcurvps, ei, p, ids)
+                - tenprod (intp (ei, p2), ids) . khce2
             ),
             b : addrow (
                 addcol (b11, b12),
