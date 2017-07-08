@@ -1020,7 +1020,7 @@ kilhup (A, v, p, ids) :=
         n : numcol (A),
         p1 : p + 1,
         Av : A . v,
-        1 / p1 * apply ("+", makelist (
+        1 / p * apply ("+", makelist (
             block (
                 [ei],
                 ei : evect (i, n),
