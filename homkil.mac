@@ -371,7 +371,7 @@ riemhom (l, g) :=
 /* solve overdetermined system by integrability conditions */
 lasolve (r, ad) :=
     block (
-        [a, a1, ac, ac1, ma, ma1, o, l, s],
+        [a, a1, ac, ac1, ma, ma1, o, l, s, ls, rr],
         print ("Computing LA curvature"),
         a : mat2amat (flatblockmatc (lacurv (r, ad))),
         print ("Elimination pass", 0),
@@ -395,7 +395,12 @@ lasolve (r, ad) :=
         print ("Solving"),
         l : factor (aelim2 (a, ac)),
         s : amat2mat (asolve (a, ac)),
-        [o, l, s]
+        print ("Restricting representation"),
+        if numcol (s) > 0 then (
+            ls : lssolve (s),
+            rr : map (lambda ([e], ls . e . s), r)
+        ) else rr : map (lambda ([e], 0), r),
+        [o, l, s, rr]
     );
 
 /* dual, i.e. negative transpose of a matrix */
