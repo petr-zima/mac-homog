@@ -1064,7 +1064,10 @@ ksfrep (conn, curv, g, c, p, A) :=
             b12 : - tenprod (intp (ei, p1), ids),
             b21 : - 1 / p * (
                 curvext1 (khcurvps, ei, p, ids)
-                - tenprod (intp (ei, p2), ids) . khce2
+                - (
+                    if p2 > n then 0
+                    else tenprod (intp (ei, p2), ids) . khce2
+                )
             ),
             b : addrow (
                 addcol (b11, b12),
