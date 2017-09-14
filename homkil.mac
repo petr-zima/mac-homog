@@ -1145,6 +1145,38 @@ sphere (n) :=
         ratsimp (spinhom (riemhom (l, g), J))
     );
 
+/* euclidean LA */
+eucla (n) :=
+    block (
+        [n1],
+        n1 : n + 1,
+        apply (append,
+            cons (
+                makelist (
+                    ematrix (n1, n1, 1, i, 1),
+                    i, 2, n1
+                ),
+                makelist (
+                    makelist (
+                        esomat (n1, 1, i, j),
+                        i, j + 1, n1
+                    ),
+                    j, 2, n1
+                )
+            )
+        )
+    );
+
+/* euclidean space */
+euclid (n) :=
+    block (
+        [l, g, J],
+        l : eucla (n),
+        g : ident (n),
+        J : stdJ (n),
+        ratsimp (spinhom (riemhom (l, g), J))
+    );
+
 /* elementary unitary matrix */
 eumat (n, x, i, j) :=
     block (
