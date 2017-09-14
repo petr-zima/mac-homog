@@ -1129,10 +1129,20 @@ sola (n) :=
         makelist (
             makelist (
                 esomat (n, 1, i, j),
-                i, j - 1
+                i, j + 1, n
             ),
             j, n
         )
+    );
+
+/* standard sphere */
+sphere (n) :=
+    block (
+        [l, g, J],
+        l : sola (n + 1),
+        g : ident (n),
+        J : stdJ (n),
+        ratsimp (spinhom (riemhom (l, g), J))
     );
 
 /* elementary unitary matrix */
