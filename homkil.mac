@@ -1177,6 +1177,38 @@ euclid (n) :=
         ratsimp (spinhom (riemhom (l, g), J))
     );
 
+/* elementary symmetric matrix */
+esymat (n, x, i, j) :=
+    ematrix (n, n, x, i, j) + ematrix (n, n, x, j, i);
+
+/* Lorentzian LA */
+lorla (n) :=
+    apply (append,
+        cons (
+            makelist (
+                esymat (n, 1, i, 1),
+                i, 2, n
+            ),
+            makelist (
+                makelist (
+                    esomat (n, 1, i, j),
+                    i, j + 1, n
+                ),
+                j, 2, n
+            )
+        )
+    );
+
+/* hyperbolic space */
+hyperb (n) :=
+    block (
+        [l, g, J],
+        l : lorla (n + 1),
+        g : ident (n),
+        J : stdJ (n),
+        ratsimp (spinhom (riemhom (l, g), J))
+    );
+
 /* elementary unitary matrix */
 eumat (n, x, i, j) :=
     block (
