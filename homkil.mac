@@ -143,6 +143,35 @@ checkla (l, ad) :=
         false
     );
 
+/* Killing form of a Lie algebra */
+lakil (l) :=
+    apply ('matrix,
+        map (
+            lambda ([a],
+                map (
+                    lambda ([b],
+                        mattrace (a . b)
+                    ),
+                    l
+                )
+            ),
+            l
+        )
+    );
+
+/* standard 2nd order Casimir element */
+casimir2 (r, ad) :=
+    block (
+        [k],
+        k : lakil (ad),
+        first (first (
+            blockmatmul (
+                matrix (r),
+                (k^^-1) . covect (r)
+            )
+        ))
+    );
+
 /* split list to fist n elements and the rest */
 nsplitls (l, n) :=
     block (
