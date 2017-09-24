@@ -738,10 +738,10 @@ kfrep (conn, curv, p) :=
         a : [],
         for i : 1 thru m do (
             ei : evect (i, n),
-            b11 : connp [i],
-            b22 : connp1 [i],
-            b12 : - intp (ei, p1),
-            b21 : - 1 / p * curvext1 (curvp, ei, p, ids),
+            b22 : connp [i],
+            b11 : connp1 [i],
+            b21 : - intp (ei, p1),
+            b12 : - 1 / p * curvext1 (curvp, ei, p, ids),
             b : addrow (
                 addcol (b11, b12),
                 addcol (b21, b22)
@@ -1128,10 +1128,10 @@ ksfrep (conn, curv, g, c, p, A) :=
         a : [],
         for i : 1 thru m do (
             ei : evect (i, n),
-            b11 : connps [i] - A . ei,
-            b22 : connp1s [i] - kilhup (A, ei, p, ids),
-            b12 : - tenprod (intp (ei, p1), ids),
-            b21 : - 1 / p * (
+            b22 : connps [i] - A . ei,
+            b11 : connp1s [i] - kilhup (A, ei, p, ids),
+            b21 : - tenprod (intp (ei, p1), ids),
+            b12 : - 1 / p * (
                 curvext1 (khcurvps, ei, p, ids)
                 - (
                     if p2 > n then 0
