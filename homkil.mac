@@ -1129,27 +1129,12 @@ ksfsolve (sh, p, A) :=
 /* standard Killing homomorphism */
 stdkilh (c, p) :=
     block (
-        [n, p1, idp, ids, cext],
+        [n, idp],
         n : numcol (c),
-        p1 : p + 1,
         idp : ident (binomial (n, p)),
-        ids : ident (length (c [1, 1])),
-        cext : apply ("+", makelist (
-            block (
-                [ei],
-                ei : evect (i, n),
-                tenprod (extp (ei, p), c [1, i])
-            ),
-            i, n
-        )),
-        matrix (makelist (
-            block (
-                [ei],
-                ei : evect (i, n),
-                tenprod (idp, c [1, i])
-                - 1 / p1 * tenprod (intp (ei, p1), ids) . cext
-            ),
-            i, n
+        matrix (map (
+            lambda ([e], tenprod (idp, e)),
+            first (c)
         ))
     );
 
