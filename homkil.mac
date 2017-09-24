@@ -1019,21 +1019,56 @@ kilh2ext (A) :=
     );
 
 /* shift Kiling homomorphism up to order p + 1 */
-kilhup (A, v, p, ids) :=
+kilhup1 (A, v, p, ids) :=
     block (
-        [n, p1, Av],
+        [n, p1, Av, iv],
         n : numcol (A),
         p1 : p + 1,
         Av : A . v,
+        iv : tenprod (intp (v, p1), ids),
         1 / p * apply ("+", makelist (
             block (
                 [ei],
                 ei : evect (i, n),
-                tenprod (extp (ei, p), ids) . Av
-                . tenprod (intp (ei, p1), ids)
+                tenprod (extp (ei, p), ids) . (
+                    Av . tenprod (intp (ei, p1), ids)
+                    - (A . ei) . iv
+                )
             ),
             i, n
         ))
+    );
+
+kilhup1ext (A, p, ids) :=
+    block (
+        [n, p1],
+        n : numcol (A),
+        p1 : p + 1,
+        apply ("+", makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (extp (ei, p1), ids)
+                . kilhup1 (A, ei, p, ids)
+            ),
+            i, n
+        ))
+    );
+
+kilhup (A, v, p, ids) :=
+    block (
+        [n, p1, p2, Av],
+        n : numcol (A),
+        p1 : p + 1,
+        p2 : p + 2,
+        kilhup1 (A, v, p, ids)
+        - (
+            if p2 > n then 0
+            else 1 / 2 / p1 * (
+                tenprod (intp (v, p2), ids)
+                . kilhup1ext (A, p, ids)
+            )
+        )
     );
 
 /* representation on Killing spinor-valued forms */
