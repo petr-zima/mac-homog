@@ -1176,6 +1176,21 @@ stdksfsolve (sh, p, a) :=
         ksfsolve (sh, p, A)
     );
 
+/* raise degree by Clifford multiplication */
+clraise (c, p) :=
+    block (
+        [n],
+        n : numcol (c),
+        apply ("+", makelist (
+            block (
+                [ei],
+                ei : evect (i, n),
+                tenprod (extp (ei, p), c [1, i])
+            ),
+            i, n
+        ))
+    );
+
 /* elementary skew symmetric matrix */
 esomat (n, x, i, j) :=
     ematrix (n, n, x, i, j) - ematrix (n, n, x, j, i);
