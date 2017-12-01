@@ -1,4 +1,4 @@
-OBJS=amat.o
+OBJS=amat.o homkil.mac
 PREFIX=~/.maxima
 
 MAXIMA=maxima
