@@ -143,25 +143,25 @@ aelim (a, ctx) := (
         mode_declare (ip, fixnum),
         ip : 0,
         for jp : 0 while ip < amatr (a) and jp < amatc (a) do (
-            p : amatget (a, ip, jp),
+            p : rat (amatget (a, ip, jp)),
             if p # 0 then (
                 u : first (content (num (p), gcd2var)),
                 v : first (content (denom (p), gcd2var)) / u,
                 if v # 1 then (
                     for j : jp while j < amatc (a) do (
-                        x : amatget (a, ip, j),
+                        x : rat (amatget (a, ip, j)),
                         amatset (a, ip, j, rat (v * x))
                     )
                 )
             ),
             for i : ip + 1 while i < amatr (a) do (
-                p : amatget (a, ip, jp),
-                q : amatget (a, i, jp),
+                p : rat (amatget (a, ip, jp)),
+                q : rat (amatget (a, i, jp)),
                 if q # 0 then (
                     [g, u, v, x0, y0] : gcd2 (p, q),
                     for j : jp while j < amatc (a) do (
-                        x : amatget (a, ip, j),
-                        y : amatget (a, i, j),
+                        x : rat (amatget (a, ip, j)),
+                        y : rat (amatget (a, i, j)),
                         amatset (a, ip, j, rat (u * x + v * y)),
                         amatset (a, i, j, rat (- y0 * x + x0 * y))
                     )
@@ -187,18 +187,18 @@ aelim2 (a, ctx) := (
         l : 1,
         for ip : amatr (a) - 1 step -1 while ip >= 0 do (
             jp : ctx [ip],
-            p : amatget (a, ip, jp),
+            p : rat (amatget (a, ip, jp)),
             l : lcm2 (l, p),
             for j : jp while j < amatc (a) do (
-                x : amatget (a, ip, j),
+                x : rat (amatget (a, ip, j)),
                 amatset (a, ip, j, rat (x / p))
             ),
             for i : ip - 1 step -1 while i >= 0 do (
-                q : amatget (a, i, jp),
+                q : rat (amatget (a, i, jp)),
                 if q # 0 then (
                     for j : jp while j < amatc (a) do (
-                        x : amatget (a, ip, j),
-                        y : amatget (a, i, j),
+                        x : rat (amatget (a, ip, j)),
+                        y : rat (amatget (a, i, j)),
                         amatset (a, i, j, rat (- x * q + y))
                     )
                 )
