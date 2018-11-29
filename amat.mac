@@ -87,6 +87,24 @@ amat2mat (a) :=
 
 /* main variable for gcd */
 define_variable (gcd2var, 1, any);
+define_variable (gcd2vars, [], any);
+
+setgcd2vars ([v]) :=
+    block (
+        if emptyp (v) then gcd2var : 1
+        else gcd2var : first (v),
+        gcd2vars : v
+    );
+
+/* normalize wrt the main variable */
+eval_when (translate, declare_translated (poly_normalize));
+
+gcd2norm (x) :=
+    block (
+        [x0],
+        x0 : poly_normalize (x, gcd2vars),
+        [rat (x / x0), x0]
+    );
 
 /* gcd which returns [g, u, v, x0, y0], where
    g = gcd (x, y)
@@ -105,7 +123,7 @@ gcd2 (x, y) :=
             [v, v1] : [v1, v - q * v1]
         ),
         if x1 # 0 then (
-            [y1, x1] : content (x1, gcd2var),
+            [y1, x1] : gcd2norm (x1),
             [u1, v1] : [denom (x), denom (y)],
             [u, v] : [u * u1 / y1, v * v1 / y1],
             [x, y] : [x / x1, y / x1]
@@ -125,7 +143,7 @@ lcm2 (x, y) :=
             [x1, y1] : [y1, r]
         ),
         if x1 # 0 then (
-            x1 : second (content (x1, gcd2var)),
+            x1 : second (gcd2norm (x1)),
             x * y / x1
         ) else (
             0
@@ -145,8 +163,8 @@ aelim (a, ctx) := (
         for jp : 0 while ip < amatr (a) and jp < amatc (a) do (
             p : rat (amatget (a, ip, jp)),
             if p # 0 then (
-                u : first (content (num (p), gcd2var)),
-                v : first (content (denom (p), gcd2var)) / u,
+                u : first (gcd2norm (num (p))),
+                v : first (gcd2norm (denom (p))) / u,
                 if v # 1 then (
                     for j : jp while j < amatc (a) do (
                         x : rat (amatget (a, ip, j)),
