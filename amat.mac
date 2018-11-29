@@ -221,3 +221,24 @@ asolve (a, ctx) := (
         s
     )
 );
+
+gcdelim (m, w) :=
+    block (
+        [a, ctx],
+        mode_declare (completearray (ctx), fixnum),
+        a : mat2amat (m),
+        ctx : aelim_ctx (a),
+        aelim (a, w, ctx),
+        amat2mat (a)
+    );
+
+gcdsolve (m, w) :=
+    block (
+        [a, ctx, l],
+        mode_declare (completearray (ctx), fixnum),
+        a : mat2amat (m),
+        ctx : aelim_ctx (a),
+        aelim (a, w, ctx),
+        l : aelim2 (a, w, ctx),
+        [amat2mat (asolve (a, ctx)), l]
+    );
