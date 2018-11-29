@@ -90,29 +90,37 @@ amat2mat (a) :=
    u * x + v * y = g
    x0 * g = x, y0 * g = y
    w = the main variable */
-eval_when (translate, declare_translated (gcdex));
-
 gcd2 (x, y, w) :=
-    block (
-        [g, u, v, x0, y0],
-        [u, v, g] : ratsimp (gcdex (x, y, w)),
-        if g = 0 then (
-            x0 : 1,
-            y0 : 0
-        ) else (
-            x0 : ratsimp (x / g),
-            y0 : ratsimp (y / g)
+    block(
+        [q, r, u, v, u1, v1, x1, y1],
+        [x1, y1] : [rat (x), rat (y)],
+        [u, u1, v, v1] : [1, 0, 0, 1],
+        while y1 # 0 do (
+            [q, r] : divide (x1, y1, w),
+            [x1, y1] : [y1, r],
+            [u, u1] : [u1, u - q * u1],
+            [v, v1] : [v1, v - q * v1]
         ),
-        [g, u, v, x0, y0]
+        if x1 # 0 then
+            [x, y] : [x / x1, y / x1]
+        else
+            [x, y] : [1, 0],
+        [x1, u, v, x, y]
     );
 
 /* lcm */
 lcm2 (x, y, w) :=
-    block (
-        [g, u, v],
-        [u, v, g] : ratsimp (gcdex (x, y, w)),
-        if g = 0 then 0
-        else ratsimp (x * y / g)
+    block(
+        [q, r, x1, y1],
+        [x1, y1] : [rat (x), rat (y)],
+        while y1 # 0 do (
+            [q, r] : divide (x1, y1, w),
+            [x1, y1] : [y1, r]
+        ),
+        if x1 # 0 then
+            x * y / x1
+        else
+            0
     );
 
 /* Gauss elimination with "gcd pivoting" */
