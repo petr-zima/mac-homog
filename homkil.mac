@@ -419,7 +419,11 @@ lasolve (r, ad) :=
             o : o + 1
         ),
         print ("Solving"),
-        [s, l] : gcdsolve (m, elimvar),
+        /* empty matrix does not know number of columns */
+        if emptyp (m) then
+            [s, l] : [ident (length (r)), 1]
+        else
+            [s, l] : gcdsolve (m, elimvar),
         print ("Restricting representation"),
         if numcol (s) > 0 then (
             ls : lssolve (s),
