@@ -403,30 +403,23 @@ riemhom (l, g) :=
 /* solve overdetermined system by integrability conditions */
 lasolve (r, ad) :=
     block (
-        [a, a1, ac, ac1, ma, ma1, o, l, s, ls, rr],
+        [m, m1, o, l, s, ls, rr],
         print ("Computing LA curvature"),
-        a : mat2amat (flatblockmatc (lacurv (r, ad))),
+        m : flatblockmatc (lacurv (r, ad)),
         print ("Elimination pass", 0),
-        ac : aelim_ctx (a),
-        aelim (a, elimvar, ac),
+        m : gcdelim (m, elimvar),
         o : 1,
         do (
             print ("Multiplication pass", o),
-            ma : amat2mat (a),
-            ma1 : flatmatlsc (matmulls (ma, r)),
-            ma1 : addrow (ma, ma1),
-            a1 : mat2amat (ma1),
+            m1 : addrow (m, flatmatlsc (matmulls (m, r))),
             print ("Elimination pass", o),
-            ac1 : aelim_ctx (a1),
-            aelim (a1, elimvar, ac1),
-            if amatr (a1) = amatr (a) then return ('done),
-            a : a1,
-            ac : ac1,
+            m1 : gcdelim (m1, elimvar),
+            if m = m1 then return ('done),
+            m : m1,
             o : o + 1
         ),
         print ("Solving"),
-        l : factor (aelim2 (a, elimvar, ac)),
-        s : amat2mat (asolve (a, ac)),
+        [s, l] : gcdsolve (m, elimvar),
         print ("Restricting representation"),
         if numcol (s) > 0 then (
             ls : lssolve (s),
@@ -776,15 +769,11 @@ checkcplx (J) :=
 /* contact distribution and its complement */
 contactsplit (J) :=
     block (
-        [J2, IJ2, a, d, z],
+        [J2, IJ2, d, z],
         J2 : J . J,
         IJ2 : ident (length (J)) + J2,
-        a : mat2amat (transpose (-J2)),
-        aelim (a, elimvar, aelim_ctx (a)),
-        d : transpose (amat2mat (a)),
-        a : mat2amat (transpose (IJ2)),
-        aelim (a, elimvar, aelim_ctx (a)),
-        z : transpose (amat2mat (a)),
+        d : transpose (gcdelim (transpose (-J2), elimvar)),
+        z : transpose (gcdelim (transpose (IJ2), elimvar)),
         [IJ2, d, z]
     );
 
@@ -808,14 +797,10 @@ checkcontact (J, IJ2, d, z) :=
 /* complementary maximal isotropic subspaces */
 isotrop (J, d) :=
     block (
-        [i, a, dp, dn],
+        [i, dp, dn],
         i : %i * ident (length (J)),
-        a : mat2amat (transpose ((J + i) . d / 2)),
-        aelim (a, elimvar, aelim_ctx (a)),
-        dp : transpose (amat2mat (a)),
-        a : mat2amat (transpose ((J - i) . d / 2)),
-        aelim (a, elimvar, aelim_ctx (a)),
-        dn : transpose (amat2mat (a)),
+        dp : transpose (gcdelim (transpose ((J + i) . d / 2), elimvar)),
+        dn : transpose (gcdelim (transpose ((J - i) . d / 2), elimvar)),
         [dp, dn]
     );
 
