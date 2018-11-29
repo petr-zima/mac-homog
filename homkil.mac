@@ -421,7 +421,7 @@ lasolve (r, ad) :=
         print ("Solving"),
         /* empty matrix does not know number of columns */
         if emptyp (m) then
-            [s, l] : [ident (length (r)), 1]
+            [s, l] : [ident (length (first (r))), 1]
         else
             [s, l] : gcdsolve (m, elimvar),
         print ("Restricting representation"),
