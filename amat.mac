@@ -95,7 +95,8 @@ define_variable (gcd2var, 1, any);
 gcd2 (x, y) :=
     block(
         [q, r, u, v, u1, v1, x1, y1],
-        [x1, y1] : [rat (x), rat (y)],
+        [x, y] : [rat (x), rat (y)],
+        [x1, y1] : [num (x), num (y)],
         [u, u1, v, v1] : [1, 0, 0, 1],
         while y1 # 0 do (
             [q, r] : divide (x1, y1, gcd2var),
@@ -105,7 +106,8 @@ gcd2 (x, y) :=
         ),
         if x1 # 0 then (
             [y1, x1] : content (x1, gcd2var),
-            [u, v] : [u / y1, v / y1],
+            [u1, v1] : [denom (x), denom (y)],
+            [u, v] : [u * u1 / y1, v * v1 / y1],
             [x, y] : [x / x1, y / x1]
         ) else (
             [x, y] : [1, 0]
@@ -143,11 +145,12 @@ aelim (a, ctx) := (
         for jp : 0 while ip < amatr (a) and jp < amatc (a) do (
             p : amatget (a, ip, jp),
             if p # 0 then (
-                u : first (content (p, gcd2var)),
-                if u # 1 then (
+                u : first (content (num (p), gcd2var)),
+                v : first (content (denom (p), gcd2var)) / u,
+                if v # 1 then (
                     for j : jp while j < amatc (a) do (
                         x : amatget (a, ip, j),
-                        amatset (a, ip, j, rat (x / u))
+                        amatset (a, ip, j, rat (v * x))
                     )
                 )
             ),
