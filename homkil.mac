@@ -427,7 +427,7 @@ lasolve (r, ad) :=
         print ("Restricting representation"),
         if numcol (s) > 0 then (
             ls : lssolve (s),
-            rr : map (lambda ([e], ls . e . s), r)
+            rr : map (lambda ([e], ratsimp (ls . e . s)), r)
         ) else rr : map (lambda ([e], 0), r),
         [o, l, s, rr]
     );
