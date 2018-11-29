@@ -73,13 +73,12 @@ amat2mat (a) :=
 /* gcd which returns [g, u, v, x0, y0], where
    g = gcd (x, y)
    u * x + v * y = g
-   x0 * g = x, y0 * g = y */
-gcdex2_var : 1;
-
-gcdex2 (x, y) :=
+   x0 * g = x, y0 * g = y
+   w = the main variable */
+gcd2 (x, y, w) :=
     block (
         [g, u, v, x0, y0],
-        [u, v, g] : ratsimp (gcdex (x, y, gcdex2_var)),
+        [u, v, g] : ratsimp (gcdex (x, y, w)),
         if g = 0 then (
             x0 : 1,
             y0 : 0
@@ -91,10 +90,10 @@ gcdex2 (x, y) :=
     );
 
 /* lcm */
-lcm2 (x, y) :=
+lcm2 (x, y, w) :=
     block (
         [g, u, v],
-        [u, v, g] : ratsimp (gcdex (x, y, gcdex2_var)),
+        [u, v, g] : ratsimp (gcdex (x, y, w)),
         if g = 0 then 0
         else ratsimp (x * y / g)
     );
@@ -103,7 +102,7 @@ lcm2 (x, y) :=
 aelim_ctx (a) :=
     make_array ('any, 1 + min (amatr (a), amatc (a)));
 
-aelim (a, ctx) :=
+aelim (a, w, ctx) :=
     block (
         [ip, p, q, x, y, g, u, v, x0, y0],
         ip : 0,
@@ -112,7 +111,7 @@ aelim (a, ctx) :=
                 p : amatget (a, ip, jp),
                 q : amatget (a, i, jp),
                 if q # 0 then (
-                    [g, u, v, x0, y0] : gcdex2 (p, q),
+                    [g, u, v, x0, y0] : gcd2 (p, q, w),
                     for j : jp while j < amatc (a) do (
                         x : amatget (a, ip, j),
                         y : amatget (a, i, j),
@@ -130,14 +129,14 @@ aelim (a, ctx) :=
         amattruncr (a, ip)
     );
 
-aelim2 (a, ctx) :=
+aelim2 (a, w, ctx) :=
     block (
         [l, jp, p, q, x, y, g, u, v],
         l : 1,
         for ip : amatr (a) - 1 step -1 while ip >= 0 do (
             jp : ctx [ip],
             p : amatget (a, ip, jp),
-            l : lcm2 (l, p),
+            l : lcm2 (l, p, w),
             for j : jp while j < amatc (a) do (
                 x : amatget (a, ip, j),
                 amatset (a, ip, j, ratsimp (x / p))

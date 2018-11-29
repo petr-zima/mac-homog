@@ -1,3 +1,6 @@
+/* main variable */
+elimvar : 1;
+
 /* number of columns of a matrix */
 numcol (m) :=
     if length (m) = 0 then 0
@@ -405,7 +408,7 @@ lasolve (r, ad) :=
         a : mat2amat (flatblockmatc (lacurv (r, ad))),
         print ("Elimination pass", 0),
         ac : aelim_ctx (a),
-        aelim (a, ac),
+        aelim (a, elimvar, ac),
         o : 1,
         do (
             print ("Multiplication pass", o),
@@ -415,14 +418,14 @@ lasolve (r, ad) :=
             a1 : mat2amat (ma1),
             print ("Elimination pass", o),
             ac1 : aelim_ctx (a1),
-            aelim (a1, ac1),
+            aelim (a1, elimvar, ac1),
             if amatr (a1) = amatr (a) then return ('done),
             a : a1,
             ac : ac1,
             o : o + 1
         ),
         print ("Solving"),
-        l : factor (aelim2 (a, ac)),
+        l : factor (aelim2 (a, elimvar, ac)),
         s : amat2mat (asolve (a, ac)),
         print ("Restricting representation"),
         if numcol (s) > 0 then (
@@ -777,10 +780,10 @@ contactsplit (J) :=
         J2 : J . J,
         IJ2 : ident (length (J)) + J2,
         a : mat2amat (transpose (-J2)),
-        aelim (a, aelim_ctx (a)),
+        aelim (a, elimvar, aelim_ctx (a)),
         d : transpose (amat2mat (a)),
         a : mat2amat (transpose (IJ2)),
-        aelim (a, aelim_ctx (a)),
+        aelim (a, elimvar, aelim_ctx (a)),
         z : transpose (amat2mat (a)),
         [IJ2, d, z]
     );
@@ -808,10 +811,10 @@ isotrop (J, d) :=
         [i, a, dp, dn],
         i : %i * ident (length (J)),
         a : mat2amat (transpose ((J + i) . d / 2)),
-        aelim (a, aelim_ctx (a)),
+        aelim (a, elimvar, aelim_ctx (a)),
         dp : transpose (amat2mat (a)),
         a : mat2amat (transpose ((J - i) . d / 2)),
-        aelim (a, aelim_ctx (a)),
+        aelim (a, elimvar, aelim_ctx (a)),
         dn : transpose (amat2mat (a)),
         [dp, dn]
     );
