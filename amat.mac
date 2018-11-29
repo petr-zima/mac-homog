@@ -141,6 +141,16 @@ aelim (a, ctx) := (
         mode_declare (ip, fixnum),
         ip : 0,
         for jp : 0 while ip < amatr (a) and jp < amatc (a) do (
+            p : amatget (a, ip, jp),
+            if p # 0 then (
+                u : first (content (p, gcd2var)),
+                if u # 1 then (
+                    for j : jp while j < amatc (a) do (
+                        x : amatget (a, ip, j),
+                        amatset (a, ip, j, rat (x / u))
+                    )
+                )
+            ),
             for i : ip + 1 while i < amatr (a) do (
                 p : amatget (a, ip, jp),
                 q : amatget (a, i, jp),
