@@ -123,10 +123,12 @@ lcm2 (x, y) :=
             [q, r] : divide (x1, y1, gcd2var),
             [x1, y1] : [y1, r]
         ),
-        if x1 # 0 then
+        if x1 # 0 then (
+            x1 : second (content (x1, gcd2var)),
             x * y / x1
-        else
+        ) else (
             0
+        )
     );
 
 /* Gauss elimination with "gcd pivoting" */
