@@ -85,24 +85,27 @@ amat2mat (a) :=
             amatr (a), amatc (a)
         );
 
+/* main variable for gcd */
+define_variable (gcd2var, 1, any);
+
 /* gcd which returns [g, u, v, x0, y0], where
    g = gcd (x, y)
    u * x + v * y = g
-   x0 * g = x, y0 * g = y
-   w = the main variable */
-gcd2 (x, y, w) :=
+   x0 * g = x, y0 * g = y */
+
+gcd2 (x, y) :=
     block(
         [q, r, u, v, u1, v1, x1, y1],
         [x1, y1] : [rat (x), rat (y)],
         [u, u1, v, v1] : [1, 0, 0, 1],
         while y1 # 0 do (
-            [q, r] : divide (x1, y1, w),
+            [q, r] : divide (x1, y1, gcd2var),
             [x1, y1] : [y1, r],
             [u, u1] : [u1, u - q * u1],
             [v, v1] : [v1, v - q * v1]
         ),
         if x1 # 0 then (
-            [y1, x1] : content (x1, w),
+            [y1, x1] : content (x1, gcd2var),
             [u, v] : [u / y1, v / y1],
             [x, y] : [x / x1, y / x1]
         ) else (
@@ -112,12 +115,12 @@ gcd2 (x, y, w) :=
     );
 
 /* lcm */
-lcm2 (x, y, w) :=
+lcm2 (x, y) :=
     block(
         [q, r, x1, y1],
         [x1, y1] : [rat (x), rat (y)],
         while y1 # 0 do (
-            [q, r] : divide (x1, y1, w),
+            [q, r] : divide (x1, y1, gcd2var),
             [x1, y1] : [y1, r]
         ),
         if x1 # 0 then
@@ -130,7 +133,7 @@ lcm2 (x, y, w) :=
 aelim_ctx (a) :=
     make_array ('fixnum, 1 + min (amatr (a), amatc (a)));
 
-aelim (a, w, ctx) := (
+aelim (a, ctx) := (
     mode_declare (completearray (ctx), fixnum),
     block (
         [ip, p, q, x, y, g, u, v, x0, y0],
@@ -141,7 +144,7 @@ aelim (a, w, ctx) := (
                 p : amatget (a, ip, jp),
                 q : amatget (a, i, jp),
                 if q # 0 then (
-                    [g, u, v, x0, y0] : gcd2 (p, q, w),
+                    [g, u, v, x0, y0] : gcd2 (p, q),
                     for j : jp while j < amatc (a) do (
                         x : amatget (a, ip, j),
                         y : amatget (a, i, j),
@@ -162,7 +165,7 @@ aelim (a, w, ctx) := (
 
 mode_declare (function (aelim), fixnum);
 
-aelim2 (a, w, ctx) := (
+aelim2 (a, ctx) := (
     mode_declare (completearray (ctx), fixnum),
     block (
         [l, jp, p, q, x, y, g, u, v],
@@ -171,7 +174,7 @@ aelim2 (a, w, ctx) := (
         for ip : amatr (a) - 1 step -1 while ip >= 0 do (
             jp : ctx [ip],
             p : amatget (a, ip, jp),
-            l : lcm2 (l, p, w),
+            l : lcm2 (l, p),
             for j : jp while j < amatc (a) do (
                 x : amatget (a, ip, j),
                 amatset (a, ip, j, ratsimp (x / p))
@@ -233,23 +236,23 @@ asolve (a, ctx) := (
     )
 );
 
-gcdelim (m, w) :=
+gcdelim (m) :=
     block (
         [a, ctx],
         mode_declare (completearray (ctx), fixnum),
         a : mat2amat (m),
         ctx : aelim_ctx (a),
-        aelim (a, w, ctx),
+        aelim (a, ctx),
         amat2mat (a)
     );
 
-gcdsolve (m, w) :=
+gcdsolve (m) :=
     block (
         [a, ctx, l],
         mode_declare (completearray (ctx), fixnum),
         a : mat2amat (m),
         ctx : aelim_ctx (a),
-        aelim (a, w, ctx),
-        l : aelim2 (a, w, ctx),
+        aelim (a, ctx),
+        l : aelim2 (a, ctx),
         [amat2mat (asolve (a, ctx)), l]
     );

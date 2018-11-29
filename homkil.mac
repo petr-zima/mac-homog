@@ -1,6 +1,3 @@
-/* main variable */
-elimvar : 1;
-
 /* number of columns of a matrix */
 numcol (m) :=
     if length (m) = 0 then 0
@@ -407,13 +404,13 @@ lasolve (r, ad) :=
         print ("Computing LA curvature"),
         m : flatblockmatc (lacurv (r, ad)),
         print ("Elimination pass", 0),
-        m : gcdelim (m, elimvar),
+        m : gcdelim (m),
         o : 1,
         do (
             print ("Multiplication pass", o),
             m1 : addrow (m, flatmatlsc (matmulls (m, r))),
             print ("Elimination pass", o),
-            m1 : gcdelim (m1, elimvar),
+            m1 : gcdelim (m1),
             if length (m) = length (m1) then return ('done),
             m : m1,
             o : o + 1
@@ -423,7 +420,7 @@ lasolve (r, ad) :=
         if emptyp (m) then
             [s, l] : [ident (length (first (r))), 1]
         else
-            [s, l] : gcdsolve (m, elimvar),
+            [s, l] : gcdsolve (m),
         print ("Restricting representation"),
         if numcol (s) > 0 then (
             ls : lssolve (s),
@@ -776,8 +773,8 @@ contactsplit (J) :=
         [J2, IJ2, d, z],
         J2 : J . J,
         IJ2 : ident (length (J)) + J2,
-        d : transpose (gcdelim (transpose (-J2), elimvar)),
-        z : transpose (gcdelim (transpose (IJ2), elimvar)),
+        d : transpose (gcdelim (transpose (-J2))),
+        z : transpose (gcdelim (transpose (IJ2))),
         [IJ2, d, z]
     );
 
@@ -803,8 +800,8 @@ isotrop (J, d) :=
     block (
         [i, dp, dn],
         i : %i * ident (length (J)),
-        dp : transpose (gcdelim (transpose ((J + i) . d / 2), elimvar)),
-        dn : transpose (gcdelim (transpose ((J - i) . d / 2), elimvar)),
+        dp : transpose (gcdelim (transpose ((J + i) . d / 2))),
+        dn : transpose (gcdelim (transpose ((J - i) . d / 2))),
         [dp, dn]
     );
 
