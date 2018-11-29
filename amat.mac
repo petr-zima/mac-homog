@@ -92,7 +92,6 @@ define_variable (gcd2var, 1, any);
    g = gcd (x, y)
    u * x + v * y = g
    x0 * g = x, y0 * g = y */
-
 gcd2 (x, y) :=
     block(
         [q, r, u, v, u1, v1, x1, y1],
@@ -150,8 +149,8 @@ aelim (a, ctx) := (
                     for j : jp while j < amatc (a) do (
                         x : amatget (a, ip, j),
                         y : amatget (a, i, j),
-                        amatset (a, ip, j, ratsimp (u * x + v * y)),
-                        amatset (a, i, j, ratsimp (- y0 * x + x0 * y))
+                        amatset (a, ip, j, rat (u * x + v * y)),
+                        amatset (a, i, j, rat (- y0 * x + x0 * y))
                     )
                 )
             ),
@@ -179,7 +178,7 @@ aelim2 (a, ctx) := (
             l : lcm2 (l, p),
             for j : jp while j < amatc (a) do (
                 x : amatget (a, ip, j),
-                amatset (a, ip, j, ratsimp (x / p))
+                amatset (a, ip, j, rat (x / p))
             ),
             for i : ip - 1 step -1 while i >= 0 do (
                 q : amatget (a, i, jp),
@@ -187,7 +186,7 @@ aelim2 (a, ctx) := (
                     for j : jp while j < amatc (a) do (
                         x : amatget (a, ip, j),
                         y : amatget (a, i, j),
-                        amatset (a, i, j, ratsimp (- x * q + y))
+                        amatset (a, i, j, rat (- x * q + y))
                     )
                 )
             )
