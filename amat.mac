@@ -2,35 +2,48 @@
 amatd (a) :=
     a [0];
 
-amatget (a, i, j) :=
+amatget (a, i, j) := (
+    mode_declare (i, fixnum, j, fixnum),
     block (
         [d],
         d : amatd (a),
         d [i, j]
-    );
+    )
+);
 
-amatset (a, i, j, x) :=
+amatset (a, i, j, x) := (
+    mode_declare (i, fixnum, j, fixnum),
     block (
         [d],
         d : amatd (a),
         d [i, j] : x
-    );
+    )
+);
 
 amatr (a) :=
     a [1];
 
+mode_declare (function (amatr), fixnum);
+
 amatc (a) :=
     a [2];
+
+mode_declare (function (amatc), fixnum);
 
 amattruncr (a, r) :=
     if r > amatr (a) then error ("amattruncr: too many rows", r)
     else a [1] : r;
 
+mode_declare (function (amattruncr), fixnum);
+
 amattruncc (a, c) :=
     if c > amatc (a) then error ("amattruncc: too many columns", c)
     else a [2] : c;
 
-newamat (r, c) :=
+mode_declare (function (amattruncc), fixnum);
+
+newamat (r, c) := (
+    mode_declare (r, fixnum, c, fixnum),
     block (
         [a],
         a : make_array ('any, 3),
@@ -38,7 +51,8 @@ newamat (r, c) :=
         a [1] : r,
         a [2] : c,
         a
-    );
+    )
+);
 
 copyamat (a) :=
     block (
@@ -51,6 +65,7 @@ copyamat (a) :=
 mat2amat (m) :=
     block (
         [r, c, a],
+        mode_declare (r, fixnum, c, fixnum),
         r : length (m),
         if r = 0 then c : 0
         else c : length (first (m)),
@@ -75,6 +90,8 @@ amat2mat (a) :=
    u * x + v * y = g
    x0 * g = x, y0 * g = y
    w = the main variable */
+eval_when (translate, declare_translated (gcdex));
+
 gcd2 (x, y, w) :=
     block (
         [g, u, v, x0, y0],
@@ -100,11 +117,13 @@ lcm2 (x, y, w) :=
 
 /* Gauss elimination with "gcd pivoting" */
 aelim_ctx (a) :=
-    make_array ('any, 1 + min (amatr (a), amatc (a)));
+    make_array ('fixnum, 1 + min (amatr (a), amatc (a)));
 
-aelim (a, w, ctx) :=
+aelim (a, w, ctx) := (
+    mode_declare (completearray (ctx), fixnum),
     block (
         [ip, p, q, x, y, g, u, v, x0, y0],
+        mode_declare (ip, fixnum),
         ip : 0,
         for jp : 0 while ip < amatr (a) and jp < amatc (a) do (
             for i : ip + 1 while i < amatr (a) do (
@@ -127,11 +146,16 @@ aelim (a, w, ctx) :=
         ),
         ctx [ip] : amatc (a),
         amattruncr (a, ip)
-    );
+    )
+);
 
-aelim2 (a, w, ctx) :=
+mode_declare (function (aelim), fixnum);
+
+aelim2 (a, w, ctx) := (
+    mode_declare (completearray (ctx), fixnum),
     block (
         [l, jp, p, q, x, y, g, u, v],
+        mode_declare (jp, fixnum),
         l : 1,
         for ip : amatr (a) - 1 step -1 while ip >= 0 do (
             jp : ctx [ip],
@@ -153,11 +177,15 @@ aelim2 (a, w, ctx) :=
             )
         ),
         l
-    );
+    )
+);
 
-asolve1 (a, ctx, s, k, ip1, j1) :=
+asolve1 (a, ctx, s, k, ip1, j1) := (
+    mode_declare (completearray (ctx), fixnum),
+    mode_declare (k, fixnum, ip1, fixnum, j1, fixnum),
     block (
         [jp1, jp],
+        mode_declare (jp1, fixnum, jp, fixnum),
         jp1 : -1,
         for ip : 0 while ip < ip1 do (
             jp : ctx [ip],
@@ -171,11 +199,14 @@ asolve1 (a, ctx, s, k, ip1, j1) :=
         amatset (s, j1, k, 1),
         for j : j1 + 1 while j < amatc (a) do
             amatset (s, j, k, 0)
-    );
+    )
+);
 
-asolve (a, ctx) :=
+asolve (a, ctx) := (
+    mode_declare (completearray (ctx), fixnum),
     block (
         [s, k, jp1, jp],
+        mode_declare (k, fixnum, jp1, fixnum, jp, fixnum),
         s : newamat (amatc (a), amatc (a) - amatr (a)),
         k : 0,
         jp1 : -1,
@@ -188,4 +219,5 @@ asolve (a, ctx) :=
             jp1 : jp
         ),
         s
-    );
+    )
+);
