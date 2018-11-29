@@ -414,7 +414,7 @@ lasolve (r, ad) :=
             m1 : addrow (m, flatmatlsc (matmulls (m, r))),
             print ("Elimination pass", o),
             m1 : gcdelim (m1, elimvar),
-            if m = m1 then return ('done),
+            if length (m) = length (m1) then return ('done),
             m : m1,
             o : o + 1
         ),
