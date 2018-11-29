@@ -101,10 +101,13 @@ gcd2 (x, y, w) :=
             [u, u1] : [u1, u - q * u1],
             [v, v1] : [v1, v - q * v1]
         ),
-        if x1 # 0 then
+        if x1 # 0 then (
+            [y1, x1] : content (x1, w),
+            [u, v] : [u / y1, v / y1],
             [x, y] : [x / x1, y / x1]
-        else
-            [x, y] : [1, 0],
+        ) else (
+            [x, y] : [1, 0]
+        ),
         [x1, u, v, x, y]
     );
 
