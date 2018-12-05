@@ -1378,3 +1378,16 @@ quats2 (s) :=
         J : stdJ (7),
         ratsimp (spinhom (riemhom (l, g), J))
     );
+
+/* nearly parallel G(2) S^7 */
+g2s7 :
+    block (
+        [l, g, J],
+        l : append (
+            [sp2[5], sp2[6], sp2[1], sp2[2], sp2[7], sp2[3], sp2[4]],
+            rest (sp2, 7)
+        ),
+        g : 9/25 * diag ([1, 1, 5, 5, 1, 5, 5]),
+        J : stdJ (7),
+        ratsimp (spinhom (riemhom (l, g), J))
+    );
