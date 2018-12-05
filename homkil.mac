@@ -1310,6 +1310,39 @@ ula (n) :=
         a
     );
 
+/* symplectic LA */
+sp1 :
+    [
+        matrix ([-%i, 0], [0, %i]),
+        matrix ([0, -1], [1, 0]),
+        matrix ([0, %i], [%i, 0])
+    ];
+
+sp2 :
+    append (
+        [
+            kronecker_product (matrix ([0, -1], [1, 0]), ident (2))
+        ],
+        map (
+            lambda ([i%],
+                kronecker_product (matrix ([0, 1], [1, 0]), i%)
+            ),
+            sp1
+        ),
+        map (
+            lambda ([i%],
+                kronecker_product (matrix ([0, 0], [0, 1]), i%)
+            ),
+            sp1
+        ),
+        map (
+            lambda ([i%],
+                kronecker_product (matrix ([1, 0], [0, 0]), i%)
+            ),
+            sp1
+        )
+    );
+
 /* standard complex or contact structure */
 stdJ2 : matrix ([0, 1], [-1, 0]);
 
@@ -1330,5 +1363,18 @@ bergs (m, s) :=
         n : 2 * m - 1,
         g : ident (n) + ematrix (n, n, s - 1, 1, 1),
         J : stdJ (n),
+        ratsimp (spinhom (riemhom (l, g), J))
+    );
+
+/* quaternionic sphere */
+quats2 (s) :=
+    block (
+        [l, g, J],
+        l : append (
+            [sp2[5], sp2[6], sp2[1], sp2[2], sp2[7], sp2[3], sp2[4]],
+            rest (sp2, 7)
+        ),
+        g : diag ([s, s, 1, 1, s, 1, 1]),
+        J : stdJ (7),
         ratsimp (spinhom (riemhom (l, g), J))
     );
