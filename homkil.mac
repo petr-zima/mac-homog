@@ -1386,3 +1386,19 @@ quats2 (r, s) :=
         J : stdJ (7),
         ratsimp (spinhom (riemhom (l, g), J))
     );
+
+/* Aloff-Wallach space W^{1,1} */
+w11 (r, s) :=
+    block (
+        [u3, l, g, J],
+        u3 : ula (3),
+        l : [
+            u3[1] - u3[6],
+            u3[2], u3[4], u3[5],
+            -u3[3], -u3[7], -u3[8],
+            -u3[1] - u3[6] + 2 * u3[9]
+        ],
+        g : diag ([r, r, s, s, r, s, s]),
+        J : stdJ (7),
+        ratsimp (spinhom (riemhom (l, g), J))
+    );
