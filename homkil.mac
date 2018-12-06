@@ -1319,35 +1319,39 @@ ula (n) :=
     );
 
 /* symplectic LA */
-sp1 :
+spla1 () :=
     [
         matrix ([-%i, 0], [0, %i]),
         matrix ([0, -1], [1, 0]),
         matrix ([0, %i], [%i, 0])
     ];
 
-sp2 :
-    append (
-        [
-            kronecker_product (matrix ([0, -1], [1, 0]), ident (2))
-        ],
-        map (
-            lambda ([i%],
-                kronecker_product (matrix ([0, 1], [1, 0]), i%)
+spla2 () :=
+    block (
+        [sp1],
+        sp1 : spla1 (),
+        append (
+            [
+                kronecker_product (matrix ([0, -1], [1, 0]), ident (2))
+            ],
+            map (
+                lambda ([i%],
+                    kronecker_product (matrix ([0, 1], [1, 0]), i%)
+                ),
+                sp1
             ),
-            sp1
-        ),
-        map (
-            lambda ([i%],
-                kronecker_product (matrix ([0, 0], [0, 1]), i%)
+            map (
+                lambda ([i%],
+                    kronecker_product (matrix ([0, 0], [0, 1]), i%)
+                ),
+                sp1
             ),
-            sp1
-        ),
-        map (
-            lambda ([i%],
-                kronecker_product (matrix ([1, 0], [0, 0]), i%)
-            ),
-            sp1
+            map (
+                lambda ([i%],
+                    kronecker_product (matrix ([1, 0], [0, 0]), i%)
+                ),
+                sp1
+            )
         )
     );
 
@@ -1377,7 +1381,8 @@ bergs (m, s) :=
 /* quaternionic sphere */
 quats2 (r, s) :=
     block (
-        [l, g, J],
+        [sp2, l, g, J],
+        sp2 : spla2 (),
         l : append (
             [sp2[5], sp2[6], sp2[1], sp2[2], sp2[7], sp2[3], sp2[4]],
             rest (sp2, 7)
