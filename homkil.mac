@@ -1375,14 +1375,14 @@ bergs (m, s) :=
     );
 
 /* quaternionic sphere */
-quats2 (s) :=
+quats2 (r, s) :=
     block (
         [l, g, J],
         l : append (
             [sp2[5], sp2[6], sp2[1], sp2[2], sp2[7], sp2[3], sp2[4]],
             rest (sp2, 7)
         ),
-        g : diag ([s, s, 1, 1, s, 1, 1]),
+        g : diag ([r, r, s, s, r, s, s]),
         J : stdJ (7),
         ratsimp (spinhom (riemhom (l, g), J))
     );
