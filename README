@@ -1,0 +1,45 @@
+This is a package of functions for solving Killing-type equations
+on homogeneous spaces in Maxima computer algebra system:
+
+http://maxima.sourceforge.net
+
+It supports the following types of Killing equations:
+
+- Killing(-Yano) forms -> kfsolve()
+- Killing spinors -> kssolve()
+- Killing spinor-valued forms -> stdksfsolve()
+
+It works at infitesimal level, the homogeneous space is represented
+as a pair (g,h) of a Lie algebra and its subalgebra, together with
+the metric and spin representation. Some Lie algebras and homogeneous
+spaces are preprogrammed.
+
+For more information consult the source code or contact the author:
+
+Petr Zima <zima@matfyz.cz>
+
+
+SIMPLE EXAMPLE OF USAGE
+=======================
+
+load ("diag");
+load ("grobner");
+load ("amat.mac");
+load ("homkil.mac");
+
+/* 5-dimensional Berger sphere with family of metrics
+   parametrized by s */
+m : bergs (3, s);
+
+/* set s as a parameter for solving */
+setgcd2vars (s);
+
+/* solve the equation for Killing 1-forms */
+kfsolve (m, 1);
+/* returns a list [p, c, s, r], where:
+   p - number of passes needed for computation
+   c - polynomial whose roots are singularities,
+       i.e. additional solutions can exist if c = 0
+   s - matrix whose columns are solutions (at the origin)
+   r - Lie algebra representation on solutions whose
+       exponential gives solutions at other points */
