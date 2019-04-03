@@ -397,14 +397,6 @@ riemhom (l, g) :=
         [g, ad, lc, curv]
     );
 
-echelon_trunc (m) :=
-    apply ('matrix,
-        sublist (
-            args (echelon (m)),
-            lambda ([x], if zeromatrixp (x) then false else true)
-        )
-    );
-
 /* solve overdetermined system by integrability conditions */
 lasolve (r, ad) :=
     block (
@@ -412,13 +404,13 @@ lasolve (r, ad) :=
         print ("Computing LA curvature"),
         m : flatblockmatc (lacurv (r, ad)),
         print ("Elimination pass", 0),
-        m : echelon_trunc (m),
+        m : gcdelim (m),
         o : 1,
         do (
             print ("Multiplication pass", o),
             m1 : addrow (m, flatmatlsc (matmulls (m, r))),
             print ("Elimination pass", o),
-            m1 : echelon_trunc (m1),
+            m1 : gcdelim (m1),
             if length (m) = length (m1) then return ('done),
             m : m1,
             o : o + 1
