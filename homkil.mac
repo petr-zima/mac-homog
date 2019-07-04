@@ -91,24 +91,28 @@ lssolve (m) :=
     );
 
 /* adjoint representation of a matrix Lie algebra */
-adjrep (l) :=
+adjrep2 (l1, l2) :=
     block (
-        [n, lss, a, aa, x, y, c],
-        n : length (l),
-        lss : lssolve (flatmatlsr (l)),
+        [n1, n2, l2ss, a, aa, x, y, c],
+        n1 : length (l1),
+        n2 : length (l2),
+        l2ss : lssolve (flatmatlsr (l2)),
         a : [],
-        for i : 1 thru n do (
-            x : l [i],
+        for i : 1 thru n1 do (
+            x : l1 [i],
             aa : matrix (),
-            for j : 1 thru n do (
-                y : l [j],
+            for j : 1 thru n2 do (
+                y : l2 [j],
                 c : x . y - y . x,
-                aa : addcol (aa, lss . flatmatc (c))
+                aa : addcol (aa, l2ss . flatmatc (c))
             ),
             a : endcons (aa, a)
         ),
         a
     );
+
+adjrep (l) :=
+    adjrep2 (l, l);
 
 /* "curvature" of a Lie algebra map, i.e. matrices
    r (x) . r (y) - r (y) . r (x) - r (ad (x) (y)) */
