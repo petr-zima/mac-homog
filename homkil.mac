@@ -415,6 +415,22 @@ riemhom (l, g) :=
         [g, ad, lc, curv]
     );
 
+/* Ricci tensor from curvature */
+ricci (curv) :=
+    block (
+        [n],
+        n : length (curv),
+        apply ('matrix,
+            makelist (
+                makelist (
+                    sum (curv[k,i][k,j], k, 1, n),
+                    j, n
+                ),
+                i, n
+            )
+        )
+    );
+
 /* solve overdetermined system by integrability conditions */
 lasolve (r, ad) :=
     block (
