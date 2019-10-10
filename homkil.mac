@@ -176,6 +176,20 @@ casimir2 (r, ad) :=
         ))
     );
 
+/* direct sum of 2 Lie algebras */
+lasum (l1, l2) :=
+    block (
+        [n1, n2, z1, z2],
+        n1 : length (first (l1)),
+        n2 : length (first (l2)),
+        z1 : zeromatrix (n1, n1),
+        z2 : zeromatrix (n2, n2),
+        append (
+            map (lambda ([m1], diag ([m1, z2])), l1),
+            map (lambda ([m2], diag ([z1, m2])), l2)
+        )
+    );
+
 /* split list to fist n elements and the rest */
 nsplitls (l, n) :=
     block (
