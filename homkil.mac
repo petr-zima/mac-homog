@@ -1314,6 +1314,26 @@ ula (n) :=
         a
     );
 
+/* special unitary LA */
+sula (n) :=
+    block (
+        [a],
+        a : [],
+        for i : 1 thru n - 1 do (
+            a : endcons (
+                eumat (n, %i, i, i) - eumat (n, %i, n, n),
+                a
+            )
+        ),
+        for i : 1 thru n do (
+            for j : i + 1 thru n do (
+                a : endcons (eumat (n, 1, j, i), a),
+                a : endcons (eumat (n, %i, j, i), a)
+            )
+        ),
+        a
+    );
+
 /* symplectic LA */
 spla1 () :=
     [
