@@ -3,20 +3,61 @@ on homogeneous spaces in Maxima computer algebra system:
 
 http://maxima.sourceforge.net
 
-It supports the following types of Killing equations:
+It is based on prolongation of the respective equations, see [1].
+Following types of Killing equations are supported:
 
 - Killing(-Yano) forms -> kfsolve()
 - Killing spinors -> kssolve()
 - Killing spinor-valued forms -> stdksfsolve()
 
-It works at infitesimal level, the homogeneous space is represented
-as a pair (g,h) of a Lie algebra and its subalgebra, together with
-the metric and spin representation. Some Lie algebras and homogeneous
-spaces are preprogrammed.
+It works at infinitesimal level, the homogeneous space is represented
+as a pair (l,k) of a Lie algebra and its subalgebra, together with
+the metric and spin representation:
+
+- (pseudo-) Riemannian space -> riemhom()
+- spin space -> spinhom()
+
+The input consists of a list of matrices which form a basis of the Lie
+algebra l, and a matrix representing the metric g.  The dimension n of
+the space is determined from the size of g.  The bases of the tangent
+space and the Lie algebra k are given by splitting the basis of l to the
+first n elements and the rest respectively.  The spin space requires
+additionally an arbitrary complex or contact structure compatible with g,
+which is used to construct the spin representation explicitly.  More or
+less complete validation of inputs is automatically performed.
+
+Some Lie algebras and homogeneous spaces are preprogrammed:
+
+- orthogonal LA -> sola()
+- Euclidean LA -> eucla()
+- Lorentzian LA -> lorla()
+- unitary LA -> ula()
+- special unitary LA -> sula()
+- symplectic LA -> spla1(), spla2()
+
+- standard sphere -> sphere()
+- Euclidean space -> euclid()
+- hyperbolic space -> hyperb()
+- Berger sphere -> bergs()
+- quaternionic sphere S^7 -> quats2()
+- Aloff-Wallach space W^{1,1} -> w11()
 
 For more information consult the source code or contact the author:
 
-Petr Zima <zima@matfyz.cz>
+Petr Zima
+Mathematical Institute of Charles University, Prague
+E-mail: zima@karlin.mff.cuni.cz
+
+Acknowledgment:
+
+The author gratefully acknowledges the support of the grants GAUK 700217
+and SVV-2017-260456.
+
+References:
+
+[1] Somberg, P., Zima P.  Killing spinor-valued forms and their
+    integrability conditions.  Preprint (2020).  Available online at:
+    https://arxiv.org/abs/2003.12431
 
 
 SIMPLE EXAMPLE OF USAGE
@@ -42,4 +83,4 @@ kfsolve (m, 1);
        i.e. additional solutions can exist if c = 0
    s - matrix whose columns are solutions (at the origin)
    r - Lie algebra representation on solutions whose
-       exponential gives solutions at other points */
+       exponential determines values at other points */
