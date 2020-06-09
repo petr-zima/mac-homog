@@ -13,7 +13,7 @@ homog.mac: $(HOMOG_SRCS)
 	$(CAT) $(HOMOG_SRCS) > $@
 
 %.o: %.mac
-	$(MAXIMA) --init= --batch-string=compile_file\(\"$<\"\)\;
+	$(MAXIMA) --init= --batch-string=compile_file\(\"$<\",\"$@\"\)\;
 
 clean:
 	$(RM) *.LISP *.UNLISP *.c *.h *.data *.o homog.mac
